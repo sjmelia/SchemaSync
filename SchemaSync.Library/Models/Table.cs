@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
 
 namespace SchemaSync.Library.Models
 {
@@ -14,8 +15,8 @@ namespace SchemaSync.Library.Models
 		/// </summary>
 		public bool IsEmpty { get; set; }
 
-		public IEnumerable<Column> Columns { get; set; }
-		public IEnumerable<Index> Indexes { get; set; }
+		public IEnumerable<Column> Columns { get; set; } = Enumerable.Empty<Column>();
+		public IEnumerable<Index> Indexes { get; set; } = Enumerable.Empty<Index>();
 
 		public override bool Equals(object obj)
 		{

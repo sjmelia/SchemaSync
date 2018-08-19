@@ -2,7 +2,7 @@
 
 namespace SchemaSync.Library.Models
 {
-	public class Schema
+	public class Database
 	{
 		public IEnumerable<Table> Tables { get; set; }
 		public IEnumerable<ForeignKey> ForeignKeys { get; set; }

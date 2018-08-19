@@ -7,6 +7,7 @@ namespace SchemaSync.Library.Models
 		public string Schema { get; set; }
 		public string Name { get; set; }
 		public string IdentityColumn { get; set; }
+		public string ClusteredIndex { get; set; }
 
 		/// <summary>
 		/// If empty, then it's okay to drop and rebuild table

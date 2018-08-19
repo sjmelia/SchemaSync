@@ -9,11 +9,24 @@ namespace SchemaSync.Library.Models
 		UniqueKey
 	}
 
+	public enum SortDirection
+	{
+		Ascending,
+		Descending
+	}
+
 	public class Index
 	{
 		public Table Table { get; set; }
 		public string Name { get; set; }
 		public IndexType Type { get; set; }
-		public IEnumerable<string> ColumnNames { get; set; }
+		public IEnumerable<IndexColumn> Columns { get; set; }
+	}
+
+	public class IndexColumn
+	{
+		public string Name { get; set; }
+		public SortDirection SortDirection { get; set; }
+		public int Position { get; set; }
 	}
 }

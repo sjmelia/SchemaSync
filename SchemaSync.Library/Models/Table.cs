@@ -16,5 +16,20 @@ namespace SchemaSync.Library.Models
 
 		public IEnumerable<Column> Columns { get; set; }
 		public IEnumerable<Index> Indexes { get; set; }
+
+		public override bool Equals(object obj)
+		{
+			Table tbl = obj as Table;
+			if (tbl != null)
+			{
+				return (Schema ?? string.Empty).ToLower().Equals(tbl.Schema.ToLower()) && (Name ?? string.Empty).ToLower().Equals(tbl.Name.ToLower());
+			}
+			return false;
+		}
+
+		public override int GetHashCode()
+		{
+			return (Schema ?? string.Empty).ToLower().GetHashCode() + (Name ?? string.Empty).ToLower().GetHashCode();
+		}
 	}
 }

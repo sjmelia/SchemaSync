@@ -12,11 +12,6 @@ namespace SchemaSync.SqlServer
 
 		protected override ObjectTypeFlags SupportedObjectTypes => ObjectTypeFlags.Tables | ObjectTypeFlags.ForeignKeys;
 
-		protected override bool SupportsTableSchemas => true;
-
-		protected override char StartDelimiter => '[';
-		protected override char EndDelimiter => ']';
-
 		protected override IEnumerable<ForeignKey> GetForeignKeys(IDbConnection connection)
 		{
 			throw new NotImplementedException();

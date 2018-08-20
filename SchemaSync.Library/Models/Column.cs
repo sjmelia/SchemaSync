@@ -1,6 +1,8 @@
-﻿namespace SchemaSync.Library.Models
+﻿using System.Collections.Generic;
+
+namespace SchemaSync.Library.Models
 {
-	public class Column
+	public class Column : DbObject
 	{
 		public Table Table { get; set; }
 		public string Name { get; set; }
@@ -10,6 +12,21 @@
 		public int Precision { get; set; }
 		public bool IsNullable { get; set; }
 		public string Default { get; set; }
+
+		public override IEnumerable<string> Alter()
+		{
+			throw new System.NotImplementedException();
+		}
+
+		public override IEnumerable<string> Create()
+		{
+			throw new System.NotImplementedException();
+		}
+
+		public override IEnumerable<string> Drop()
+		{
+			throw new System.NotImplementedException();
+		}
 
 		public override bool Equals(object obj)
 		{
@@ -24,6 +41,11 @@
 		public override int GetHashCode()
 		{
 			return Table.GetHashCode() + (Name ?? string.Empty).ToLower().GetHashCode();
+		}
+
+		public override bool IsAltered(object compare)
+		{
+			throw new System.NotImplementedException();
 		}
 	}
 }

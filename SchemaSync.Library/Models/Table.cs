@@ -3,7 +3,7 @@ using System.Linq;
 
 namespace SchemaSync.Library.Models
 {
-	public class Table
+	public class Table : DbObject
 	{
 		public string Schema { get; set; }
 		public string Name { get; set; }
@@ -18,6 +18,21 @@ namespace SchemaSync.Library.Models
 		public IEnumerable<Column> Columns { get; set; } = Enumerable.Empty<Column>();
 		public IEnumerable<Index> Indexes { get; set; } = Enumerable.Empty<Index>();
 
+		public override IEnumerable<string> Alter()
+		{
+			throw new System.NotImplementedException();
+		}
+
+		public override IEnumerable<string> Create()
+		{
+			throw new System.NotImplementedException();
+		}
+
+		public override IEnumerable<string> Drop()
+		{
+			throw new System.NotImplementedException();
+		}
+
 		public override bool Equals(object obj)
 		{
 			Table tbl = obj as Table;
@@ -31,6 +46,16 @@ namespace SchemaSync.Library.Models
 		public override int GetHashCode()
 		{
 			return (Schema ?? string.Empty).ToLower().GetHashCode() + (Name ?? string.Empty).ToLower().GetHashCode();
+		}
+
+		public override string ToString()
+		{
+			return (!string.IsNullOrEmpty(Schema)) ? $"{Schema}.{Name}" : Name;
+		}
+
+		public override bool IsAltered(object compare)
+		{
+			throw new System.NotImplementedException();
 		}
 	}
 }

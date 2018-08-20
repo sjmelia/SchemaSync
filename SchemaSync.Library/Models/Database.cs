@@ -82,9 +82,6 @@ namespace SchemaSync.Library.Models
 		#region object discovery abstract methods
 		protected abstract DatabaseSourceFlags SupportedSources { get; }
 		protected abstract ObjectTypeFlags SupportedObjectTypes { get; }
-		protected abstract bool SupportsTableSchemas { get; }
-		protected abstract char StartDelimiter { get; }
-		protected abstract char EndDelimiter { get; }
 
 		protected abstract IEnumerable<Table> GetTables(IDbConnection connection);
 		protected abstract IEnumerable<Table> GetTables(Assembly assembly);

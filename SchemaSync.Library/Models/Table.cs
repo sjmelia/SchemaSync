@@ -25,12 +25,13 @@ namespace SchemaSync.Library.Models
 
 		public override IEnumerable<string> Create()
 		{
-			throw new System.NotImplementedException();
+			string columns = string.Join(",\r\n", Columns.OrderBy(col => col.Position).Select(col => $"\t{col.Syntax()}"));
+			yield return $"CREATE TABLE <{ToString()}> (\r\n{columns})";
 		}
 
 		public override IEnumerable<string> Drop()
 		{
-			throw new System.NotImplementedException();
+			yield return $"DROP TABLE <{ToString()}>";
 		}
 
 		public override bool Equals(object obj)

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace SchemaSync.Library.Models
 {
@@ -16,17 +17,17 @@ namespace SchemaSync.Library.Models
 		public string Default { get; set; }
 		public int Position { get; set; }		
 
-		public override IEnumerable<string> Alter()
+		public override IEnumerable<string> AlterCommands()
 		{
 			yield return $"ALTER TABLE <{Table}> ALTER {Syntax()}";
 		}
 
-		public override IEnumerable<string> Create()
+		public override IEnumerable<string> CreateCommands()
 		{
 			yield return $"ALTER TABLE <{Table}> ADD {Syntax()}";
 		}
 
-		public override IEnumerable<string> Drop()
+		public override IEnumerable<string> DropCommands()
 		{
 			yield return $"ALTER TABLE <{Table}> DROP COLUMN <{Name}>";
 		}
@@ -56,6 +57,11 @@ namespace SchemaSync.Library.Models
 		public override bool IsAltered(object compare)
 		{
 			throw new System.NotImplementedException();
+		}
+
+		public override IEnumerable<DbObject> GetDependencies(Database database)
+		{
+			return Enumerable.Empty<DbObject>();
 		}
 	}
 }

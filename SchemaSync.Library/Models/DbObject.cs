@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 
 namespace SchemaSync.Library.Models
 {
@@ -12,23 +11,36 @@ namespace SchemaSync.Library.Models
 
 		/// <summary>
 		/// Generates the SQL CREATE statement(s) for an object
-		/// </summary>		
-		public abstract IEnumerable<string> Create();
+		/// </summary>
+		public abstract IEnumerable<string> CreateCommands();
 
 		/// <summary>
 		/// Generates the SQL DROP statement(s) for an object
-		/// </summary>		
-		public abstract IEnumerable<string> Drop();
+		/// </summary>
+		public abstract IEnumerable<string> DropCommands();
 
 		/// <summary>
 		/// Generates the SQL ALTER statement(s) for an object
-		/// </summary>		
-		public abstract IEnumerable<string> Alter();
+		/// </summary>
+		public abstract IEnumerable<string> AlterCommands();
 
-		public IEnumerable<string> Rebuild()
+		public abstract IEnumerable<DbObject> GetDependencies(Database database);
+
+		public IEnumerable<string> Rebuild(Database database)
 		{
-			foreach (var cmd in Drop()) yield return cmd;
-			foreach (var cmd in Create()) yield return cmd;
+			foreach (var @object in GetDependencies(database))
+			{
+				foreach (var cmd in @object.DropCommands()) yield return cmd;
+			}
+
+			foreach (var cmd in DropCommands()) yield return cmd;
+
+			foreach (var cmd in CreateCommands()) yield return cmd;
+
+			foreach (var @object in GetDependencies(database))
+			{
+				foreach (var cmd in @object.CreateCommands()) yield return cmd;
+			}
 		}
 	}
 }

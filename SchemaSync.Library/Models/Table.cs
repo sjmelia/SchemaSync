@@ -18,18 +18,18 @@ namespace SchemaSync.Library.Models
 		public IEnumerable<Column> Columns { get; set; } = Enumerable.Empty<Column>();
 		public IEnumerable<Index> Indexes { get; set; } = Enumerable.Empty<Index>();
 
-		public override IEnumerable<string> Alter()
+		public override IEnumerable<string> AlterCommands()
 		{
 			throw new System.NotImplementedException();
 		}
 
-		public override IEnumerable<string> Create()
+		public override IEnumerable<string> CreateCommands()
 		{
 			string columns = string.Join(",\r\n", Columns.OrderBy(col => col.Position).Select(col => $"\t{col.Syntax()}"));
 			yield return $"CREATE TABLE <{ToString()}> (\r\n{columns})";
 		}
 
-		public override IEnumerable<string> Drop()
+		public override IEnumerable<string> DropCommands()
 		{
 			yield return $"DROP TABLE <{ToString()}>";
 		}
@@ -57,6 +57,11 @@ namespace SchemaSync.Library.Models
 		public override bool IsAltered(object compare)
 		{
 			throw new System.NotImplementedException();
+		}
+
+		public override IEnumerable<DbObject> GetDependencies(Database database)
+		{
+			return database.ForeignKeys.Where(fk => fk.ReferencedTable.Equals(this));
 		}
 	}
 }

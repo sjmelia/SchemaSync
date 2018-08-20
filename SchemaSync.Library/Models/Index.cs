@@ -23,12 +23,12 @@ namespace SchemaSync.Library.Models
 		public IndexType Type { get; set; }
 		public IEnumerable<IndexColumn> Columns { get; set; }
 
-		public override IEnumerable<string> Alter()
+		public override IEnumerable<string> AlterCommands()
 		{
 			throw new System.NotImplementedException();
 		}
 
-		public override IEnumerable<string> Create()
+		public override IEnumerable<string> CreateCommands()
 		{
 			string columnList = string.Join(", ", Columns.OrderBy(col => col.Position).Select(col => $"<{col.Name}> {((col.SortDirection == SortDirection.Ascending) ? "ASC" : "DESC")}"));
 
@@ -48,9 +48,14 @@ namespace SchemaSync.Library.Models
 			}			
 		}
 
-		public override IEnumerable<string> Drop()
+		public override IEnumerable<string> DropCommands()
 		{
 			yield return $"DROP INDEX <{Name}> ON <{Table}>";
+		}
+
+		public override IEnumerable<DbObject> GetDependencies(Database database)
+		{
+			return Enumerable.Empty<DbObject>();
 		}
 
 		public override bool IsAltered(object compare)

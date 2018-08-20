@@ -35,7 +35,7 @@ namespace SchemaSync.Library.Models
 			switch (Type)
 			{
 				case IndexType.Index:
-					yield return $"CREATE INDEX <{Name}> ON <{Table}> ()";
+					yield return $"CREATE INDEX <{Name}> ON <{Table}> ({columnList})";
 					break;
 
 				case IndexType.UniqueKey:
@@ -50,7 +50,7 @@ namespace SchemaSync.Library.Models
 
 		public override IEnumerable<string> Drop()
 		{
-			throw new System.NotImplementedException();
+			yield return $"DROP INDEX <{Name}> ON <{Table}>";
 		}
 
 		public override bool IsAltered(object compare)

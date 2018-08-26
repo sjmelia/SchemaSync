@@ -106,10 +106,11 @@ namespace SchemaSync.Library.Models
 			if ((db.SupportedSources & DatabaseSourceFlags.Assembly) == DatabaseSourceFlags.Assembly)
 			{
 				db.Source = DatabaseSourceFlags.Assembly;
-				if ((db.SupportedObjectTypes & ObjectTypeFlags.Tables) == ObjectTypeFlags.Tables) db.Tables = db.GetTables(assembly);
-				if ((db.SupportedObjectTypes & ObjectTypeFlags.ForeignKeys) == ObjectTypeFlags.ForeignKeys) db.ForeignKeys = db.GetForeignKeys(assembly);
-				if ((db.SupportedObjectTypes & ObjectTypeFlags.Procedures) == ObjectTypeFlags.Procedures) db.Procedures = db.GetProcedures(assembly);
-				if ((db.SupportedObjectTypes & ObjectTypeFlags.Views) == ObjectTypeFlags.Views) db.Views = db.GetViews(assembly);
+				var modelTypes = db.GetModelTypes(assembly);
+				if ((db.SupportedObjectTypes & ObjectTypeFlags.Tables) == ObjectTypeFlags.Tables) db.Tables = db.GetTables(modelTypes);
+				if ((db.SupportedObjectTypes & ObjectTypeFlags.ForeignKeys) == ObjectTypeFlags.ForeignKeys) db.ForeignKeys = db.GetForeignKeys(modelTypes);
+				if ((db.SupportedObjectTypes & ObjectTypeFlags.Procedures) == ObjectTypeFlags.Procedures) db.Procedures = db.GetProcedures(modelTypes);
+				if ((db.SupportedObjectTypes & ObjectTypeFlags.Views) == ObjectTypeFlags.Views) db.Views = db.GetViews(modelTypes);
 				return db;
 			}
 			else
@@ -120,20 +121,24 @@ namespace SchemaSync.Library.Models
 		#endregion
 
 		#region object discovery abstract methods
+
 		protected abstract DatabaseSourceFlags SupportedSources { get; }
-		protected abstract ObjectTypeFlags SupportedObjectTypes { get; }
+		protected abstract ObjectTypeFlags SupportedObjectTypes { get; }		
 
+		// connection-source
 		protected abstract IEnumerable<Table> GetTables(IDbConnection connection);
-		protected abstract IEnumerable<Table> GetTables(Assembly assembly);
-
 		protected abstract IEnumerable<ForeignKey> GetForeignKeys(IDbConnection connection);
-		protected abstract IEnumerable<ForeignKey> GetForeignKeys(Assembly assembly);
-
 		protected abstract IEnumerable<Procedure> GetProcedures(IDbConnection connection);
-		protected abstract IEnumerable<Procedure> GetProcedures(Assembly assembly);
-
 		protected abstract IEnumerable<View> GetViews(IDbConnection connection);
-		protected abstract IEnumerable<View> GetViews(Assembly assembly);
+
+		// assembly source
+		protected abstract IEnumerable<Type> GetModelTypes(Assembly assembly);
+		protected abstract IEnumerable<Table> GetTables(IEnumerable<Type> modelTypes);
+		protected abstract Column ColumnFromProperty(PropertyInfo propertyInfo);
+		protected abstract IEnumerable<ForeignKey> GetForeignKeys(IEnumerable<Type> modelTypes);
+		protected abstract IEnumerable<Procedure> GetProcedures(IEnumerable<Type> modelTypes);
+		protected abstract IEnumerable<View> GetViews(IEnumerable<Type> modelTypes);
+		
 		#endregion
 	}
 }

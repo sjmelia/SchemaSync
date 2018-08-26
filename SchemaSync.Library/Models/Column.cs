@@ -1,6 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
+﻿using System.Collections.Generic;
 
 namespace SchemaSync.Library.Models
 {
@@ -13,9 +11,10 @@ namespace SchemaSync.Library.Models
 		/// Combines the system type, length, precision, scale, and identity info
 		/// </summary>
 		public string DataType { get; set; }
-		public bool IsNullable { get; set; }		
+
+		public bool IsNullable { get; set; }
 		public string Default { get; set; }
-		public int Position { get; set; }		
+		public int Position { get; set; }
 
 		public override IEnumerable<string> AlterCommands()
 		{
@@ -57,11 +56,6 @@ namespace SchemaSync.Library.Models
 		public override bool IsAltered(object compare)
 		{
 			throw new System.NotImplementedException();
-		}
-
-		public override IEnumerable<DbObject> GetDependencies(Database database)
-		{
-			return Enumerable.Empty<DbObject>();
 		}
 	}
 }

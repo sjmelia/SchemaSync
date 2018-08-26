@@ -27,6 +27,11 @@ namespace SchemaSync.Library.Models
 		{
 			string columns = string.Join(",\r\n", Columns.OrderBy(col => col.Position).Select(col => $"\t{col.Syntax()}"));
 			yield return $"CREATE TABLE <{ToString()}> (\r\n{columns})";
+
+			foreach (var index in Indexes)
+			{
+				foreach (var cmd in index.CreateCommands()) yield return cmd;
+			}
 		}
 
 		public override IEnumerable<string> DropCommands()

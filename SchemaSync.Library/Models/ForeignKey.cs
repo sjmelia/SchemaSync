@@ -1,5 +1,4 @@
 ﻿using System.Collections.Generic;
-using System.Linq;
 
 namespace SchemaSync.Library.Models
 {
@@ -29,14 +28,25 @@ namespace SchemaSync.Library.Models
 			yield return $"ALTER TABLE <{ReferencedTable}> DROP CONSTRAINT <{Name}>";
 		}
 
-		public override IEnumerable<DbObject> GetDependencies(Database database)
-		{
-			return Enumerable.Empty<DbObject>();
-		}
-
 		public override bool IsAltered(object compare)
 		{
 			throw new System.NotImplementedException();
+		}
+
+		public override bool Equals(object obj)
+		{
+			ForeignKey fk = obj as ForeignKey;
+			if (fk != null)
+			{
+				return fk.ReferencedTable.Equals(ReferencedTable) && fk.ReferencingColumn.Equals(ReferencingColumn);
+			}
+
+			return false;
+		}
+
+		public override int GetHashCode()
+		{
+			return ReferencedTable.GetHashCode() + ReferencingColumn.GetHashCode();
 		}
 	}
 }

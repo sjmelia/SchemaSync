@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
 
 namespace SchemaSync.Library.Models
 {
@@ -24,7 +25,13 @@ namespace SchemaSync.Library.Models
 		/// </summary>
 		public abstract IEnumerable<string> AlterCommands();
 
-		public abstract IEnumerable<DbObject> GetDependencies(Database database);
+		/// <summary>
+		/// Override this to get the dependencies of an object that must be dropped and created whenever rebuilding this object
+		/// </summary>
+		public virtual IEnumerable<DbObject> GetDependencies(Database database)
+		{
+			return Enumerable.Empty<DbObject>();
+		}
 
 		public IEnumerable<string> Rebuild(Database database)
 		{

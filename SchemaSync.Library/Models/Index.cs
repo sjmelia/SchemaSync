@@ -23,12 +23,12 @@ namespace SchemaSync.Library.Models
 		public IndexType Type { get; set; }
 		public IEnumerable<IndexColumn> Columns { get; set; }
 
-		public override IEnumerable<string> AlterCommands()
+		public override IEnumerable<string> AlterCommands(SqlSyntax syntax)
 		{
 			throw new System.NotImplementedException();
 		}
 
-		public override IEnumerable<string> CreateCommands()
+		public override IEnumerable<string> CreateCommands(SqlSyntax syntax)
 		{
 			string columnList = string.Join(", ", Columns.OrderBy(col => col.Position).Select(col => $"<{col.Name}> {((col.SortDirection == SortDirection.Ascending) ? "ASC" : "DESC")}"));
 
@@ -48,7 +48,7 @@ namespace SchemaSync.Library.Models
 			}			
 		}
 
-		public override IEnumerable<string> DropCommands()
+		public override IEnumerable<string> DropCommands(SqlSyntax syntax)
 		{
 			yield return $"DROP INDEX <{Name}> ON <{Table}>";
 		}

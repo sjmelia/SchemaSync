@@ -1,4 +1,5 @@
-﻿using System;
+﻿using SchemaSync.Library.Models;
+using System;
 using System.Linq;
 using System.Text.RegularExpressions;
 
@@ -9,22 +10,29 @@ namespace SchemaSync.Library
 		/// <summary>
 		/// Indicates whether object names are prefixed with the table schema
 		/// </summary>
-		protected abstract bool SupportsSchemas { get; }
+		public abstract bool SupportsSchemas { get; }
 
 		/// <summary>
 		/// Allows SQL Server to assume "dbo" as default schema
 		/// </summary>
-		protected abstract string DefaultSchema { get; }
+		public abstract string DefaultSchema { get; }
 
 		/// <summary>
 		/// Starting object name delimiter
 		/// </summary>
-		protected abstract char StartDelimiter { get; }
+		public abstract char StartDelimiter { get; }
 
 		/// <summary>
 		/// Ending object name delimiter
 		/// </summary>
-		protected abstract char EndDelimiter { get; }
+		public abstract char EndDelimiter { get; }
+
+		/// <summary>
+		/// Syntax for autoincrement/identity columns
+		/// </summary>
+		public abstract string IdentitySyntax { get; }
+
+		public abstract string GetDataTypeDefinition(Column column);
 
 		/// <summary>
 		/// Applies start and end object name delimiters around names marked with open and close brackets in the specified input

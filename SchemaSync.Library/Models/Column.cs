@@ -6,27 +6,26 @@ namespace SchemaSync.Library.Models
 	{
 		public Table Table { get; set; }
 		public string Name { get; set; }
-
-		/// <summary>
-		/// Combines the system type, length, precision, scale, and identity info
-		/// </summary>
 		public string DataType { get; set; }
-
 		public bool IsNullable { get; set; }
 		public string Default { get; set; }
+		public string Collation { get; set; }
+		public int MaxLength { get; set; }
+		public int Scale { get; set; }
+		public int Precision { get; set; }
 		public int Position { get; set; }
 
-		public override IEnumerable<string> AlterCommands()
+		public override IEnumerable<string> AlterCommands(SqlSyntax syntax)
 		{
-			yield return $"ALTER TABLE <{Table}> ALTER {Syntax()}";
+			yield return $"ALTER TABLE <{Table}> ALTER COLUMN {Definition(syntax)}";
 		}
 
-		public override IEnumerable<string> CreateCommands()
+		public override IEnumerable<string> CreateCommands(SqlSyntax syntax)
 		{
-			yield return $"ALTER TABLE <{Table}> ADD {Syntax()}";
+			yield return $"ALTER TABLE <{Table}> ADD {Definition(syntax)}";
 		}
 
-		public override IEnumerable<string> DropCommands()
+		public override IEnumerable<string> DropCommands(SqlSyntax syntax)
 		{
 			yield return $"ALTER TABLE <{Table}> DROP COLUMN <{Name}>";
 		}
@@ -41,9 +40,10 @@ namespace SchemaSync.Library.Models
 			return false;
 		}
 
-		internal string Syntax()
+		internal string Definition(SqlSyntax syntax)
 		{
-			string result = $"<{Name}> {DataType} {((IsNullable) ? "NULL" : "NOT NULL")}";
+			string identity = (Table.IdentityColumn.Equals(Name)) ? $" {syntax.IdentitySyntax}" : string.Empty;
+			string result = $"<{Name}> {syntax.GetDataTypeDefinition(this)}{identity} {((IsNullable) ? "NULL" : "NOT NULL")}";
 			if (!string.IsNullOrEmpty(Default)) result += $" DEFAULT ({Default})";
 			return result;
 		}

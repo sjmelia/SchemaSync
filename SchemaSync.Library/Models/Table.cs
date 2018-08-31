@@ -8,7 +8,7 @@ namespace SchemaSync.Library.Models
 		public string Schema { get; set; }
 		public string Name { get; set; }
 		public string IdentityColumn { get; set; }
-		public string ClusteredIndex { get; set; }
+		public string ClusteredIndex { get; set; }		
 
 		/// <summary>
 		/// If empty, then it's okay to drop and rebuild table
@@ -18,23 +18,23 @@ namespace SchemaSync.Library.Models
 		public IEnumerable<Column> Columns { get; set; } = Enumerable.Empty<Column>();
 		public IEnumerable<Index> Indexes { get; set; } = Enumerable.Empty<Index>();
 
-		public override IEnumerable<string> AlterCommands()
+		public override IEnumerable<string> AlterCommands(SqlSyntax syntax)
 		{
 			throw new System.NotImplementedException();
 		}
 
-		public override IEnumerable<string> CreateCommands()
+		public override IEnumerable<string> CreateCommands(SqlSyntax syntax)
 		{
-			string columns = string.Join(",\r\n", Columns.OrderBy(col => col.Position).Select(col => $"\t{col.Syntax()}"));
+			string columns = string.Join(",\r\n", Columns.OrderBy(col => col.Position).Select(col => $"\t{col.Definition(syntax)}"));
 			yield return $"CREATE TABLE <{ToString()}> (\r\n{columns})";
 
 			foreach (var index in Indexes)
 			{
-				foreach (var cmd in index.CreateCommands()) yield return cmd;
+				foreach (var cmd in index.CreateCommands(syntax)) yield return cmd;
 			}
 		}
 
-		public override IEnumerable<string> DropCommands()
+		public override IEnumerable<string> DropCommands(SqlSyntax syntax)
 		{
 			yield return $"DROP TABLE <{ToString()}>";
 		}

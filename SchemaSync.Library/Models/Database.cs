@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Data;
 using System.Linq;
 using System.Reflection;
+using System.Threading.Tasks;
 
 namespace SchemaSync.Library.Models
 {
@@ -30,6 +31,7 @@ namespace SchemaSync.Library.Models
 		public IEnumerable<ForeignKey> ForeignKeys { get; set; }
 		public IEnumerable<Procedure> Procedures { get; set; }
 		public IEnumerable<View> Views { get; set; }
+		public string Collation { get; set; }
 
 		public Database()
 		{
@@ -134,7 +136,8 @@ namespace SchemaSync.Library.Models
 		// assembly source
 		protected abstract IEnumerable<Type> GetModelTypes(Assembly assembly);
 		protected abstract IEnumerable<Table> GetTables(IEnumerable<Type> modelTypes);
-		protected abstract Column ColumnFromProperty(PropertyInfo propertyInfo);
+		protected abstract Column GetColumnFromProperty(PropertyInfo propertyInfo);
+		protected abstract Table GetTableFromType(Type modelType);
 		protected abstract IEnumerable<ForeignKey> GetForeignKeys(IEnumerable<Type> modelTypes);
 		protected abstract IEnumerable<Procedure> GetProcedures(IEnumerable<Type> modelTypes);
 		protected abstract IEnumerable<View> GetViews(IEnumerable<Type> modelTypes);

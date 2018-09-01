@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Data;
 using System.Linq;
 using System.Reflection;
-using System.Threading.Tasks;
 
 namespace SchemaSync.Library.Models
 {
@@ -38,9 +37,9 @@ namespace SchemaSync.Library.Models
 			Source = DatabaseSourceFlags.NotSet;
 		}
 
-		public ObjectComparison Compare(Database database)
+		public SchemaComparison Compare(Database database)
 		{
-			var result = new ObjectComparison();
+			var result = new SchemaComparison();
 			result.Create = CompareCreateObjects(database);
 			result.Alter = CompareAlterObjects(database);
 			result.Drop = CompareDropObjects(database);
@@ -78,6 +77,7 @@ namespace SchemaSync.Library.Models
 		}
 
 		#region static initializer methods
+
 		public static T FromConnection<T>(IDbConnection connection) where T : Database, new()
 		{
 			var db = new T();
@@ -120,28 +120,38 @@ namespace SchemaSync.Library.Models
 				throw new NotImplementedException("This Database doesn't implement an Assembly source.");
 			}
 		}
-		#endregion
+
+		#endregion static initializer methods
 
 		#region object discovery abstract methods
 
 		protected abstract DatabaseSourceFlags SupportedSources { get; }
-		protected abstract ObjectTypeFlags SupportedObjectTypes { get; }		
+		protected abstract ObjectTypeFlags SupportedObjectTypes { get; }
 
 		// connection-source
 		protected abstract IEnumerable<Table> GetTables(IDbConnection connection);
+
 		protected abstract IEnumerable<ForeignKey> GetForeignKeys(IDbConnection connection);
+
 		protected abstract IEnumerable<Procedure> GetProcedures(IDbConnection connection);
+
 		protected abstract IEnumerable<View> GetViews(IDbConnection connection);
 
 		// assembly source
 		protected abstract IEnumerable<Type> GetModelTypes(Assembly assembly);
+
 		protected abstract IEnumerable<Table> GetTables(IEnumerable<Type> modelTypes);
+
 		protected abstract Column GetColumnFromProperty(PropertyInfo propertyInfo);
+
 		protected abstract Table GetTableFromType(Type modelType);
+
 		protected abstract IEnumerable<ForeignKey> GetForeignKeys(IEnumerable<Type> modelTypes);
+
 		protected abstract IEnumerable<Procedure> GetProcedures(IEnumerable<Type> modelTypes);
+
 		protected abstract IEnumerable<View> GetViews(IEnumerable<Type> modelTypes);
-		
-		#endregion
+
+		#endregion object discovery abstract methods
 	}
 }

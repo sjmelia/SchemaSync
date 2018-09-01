@@ -5,9 +5,10 @@ namespace SchemaSync.Library.Models
 {
 	public enum IndexType
 	{
-		Index,
-		PrimaryKey,
-		UniqueKey
+		PrimaryKey = 1,
+		UniqueIndex = 2,
+		UniqueConstraint = 3,
+		NonUnique = 4		
 	}
 
 	public enum SortDirection
@@ -21,6 +22,7 @@ namespace SchemaSync.Library.Models
 		public Table Table { get; set; }
 		public string Name { get; set; }
 		public IndexType Type { get; set; }
+		public bool IsClustered { get; set; }
 		public IEnumerable<IndexColumn> Columns { get; set; }
 
 		public override IEnumerable<string> AlterCommands(SqlSyntax syntax)
@@ -32,18 +34,20 @@ namespace SchemaSync.Library.Models
 		{
 			string columnList = string.Join(", ", Columns.OrderBy(col => col.Position).Select(col => $"<{col.Name}> {((col.SortDirection == SortDirection.Ascending) ? "ASC" : "DESC")}"));
 
+			string clustered = (IsClustered) ? "CLUSTERED" : "NONCLUSTERED";
+
 			switch (Type)
 			{
-				case IndexType.Index:
-					yield return $"CREATE INDEX <{Name}> ON <{Table}> ({columnList})";
+				case IndexType.UniqueIndex:
+					yield return $"CREATE {clustered} INDEX <{Name}> ON <{Table}> ({columnList})";
 					break;
 
-				case IndexType.UniqueKey:
-					yield return $"ALTER TABLE <{Table}> ADD CONSTRAINT <{Name}> UNIQUE ({columnList})";
+				case IndexType.UniqueConstraint:
+					yield return $"ALTER TABLE <{Table}> ADD CONSTRAINT <{Name}> UNIQUE {clustered} ({columnList})";
 					break;
 
 				case IndexType.PrimaryKey:
-					yield return $"ALTER TABLE <{Table}> ADD CONSTRAINT <{Name}> PRIMARY KEY ({columnList})";
+					yield return $"ALTER TABLE <{Table}> ADD CONSTRAINT <{Name}> PRIMARY KEY {clustered} ({columnList})";
 					break;
 			}			
 		}
@@ -53,14 +57,25 @@ namespace SchemaSync.Library.Models
 			yield return $"DROP INDEX <{Name}> ON <{Table}>";
 		}
 
-		public override IEnumerable<DbObject> GetDependencies(Database database)
-		{
-			return Enumerable.Empty<DbObject>();
-		}
-
 		public override bool IsAltered(object compare)
 		{
 			throw new System.NotImplementedException();
+		}
+
+		public override bool Equals(object obj)
+		{
+			var test = obj as Index;
+			if (test != null)
+			{
+				return test.Table.Equals(Table) && test.Name.ToLower().Equals(Name.ToLower());
+			}
+
+			return false;
+		}
+
+		public override int GetHashCode()
+		{
+			return Table.GetHashCode() + Name.ToLower().GetHashCode();
 		}
 	}
 

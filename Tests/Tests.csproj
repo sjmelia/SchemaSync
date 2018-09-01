@@ -68,6 +68,17 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
+    <EmbeddedResource Include="Resources\Hs5.bacpac" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\SchemaSync.Library\SchemaSync.Library.csproj">
+      <Project>{551BDC7A-9001-427A-BB3A-05DFA1E855C7}</Project>
+      <Name>SchemaSync.Library</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\SchemaSync.SqlServer\SchemaSync.SqlServer.csproj">
+      <Project>{1944A83D-0CE9-4DBE-BFDE-4618AEA4FE66}</Project>
+      <Name>SchemaSync.SqlServer</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(VSToolsPath)\TeamTest\Microsoft.TestTools.targets" Condition="Exists('$(VSToolsPath)\TeamTest\Microsoft.TestTools.targets')" />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

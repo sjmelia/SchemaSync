@@ -10,12 +10,12 @@ namespace SchemaSync.Library.Models
 		public bool CascadeDelete { get; set; }
 		public bool CascadeUpdate { get; set; }
 
-		public override IEnumerable<string> AlterCommands()
+		public override IEnumerable<string> AlterCommands(SqlSyntax syntax)
 		{
 			throw new System.NotImplementedException();
 		}
 
-		public override IEnumerable<string> CreateCommands()
+		public override IEnumerable<string> CreateCommands(SqlSyntax syntax)
 		{
 			string cmd = $"ALTER TABLE <{ReferencingColumn.Table}> ADD CONSTRAINT <{Name}> FOREIGN KEY (<{ReferencingColumn.Name}>) REFERENCES <{ReferencedTable}> (<{ReferencedTable.IdentityColumn}>)";
 			if (CascadeUpdate) cmd += " ON UPDATE CASCADE";
@@ -23,7 +23,7 @@ namespace SchemaSync.Library.Models
 			yield return cmd;
 		}
 
-		public override IEnumerable<string> DropCommands()
+		public override IEnumerable<string> DropCommands(SqlSyntax syntax)
 		{
 			yield return $"ALTER TABLE <{ReferencedTable}> DROP CONSTRAINT <{Name}>";
 		}

@@ -6,9 +6,15 @@ namespace SchemaSync.Library.Models
 	public abstract class DbObject
 	{
 		/// <summary>
-		/// Used by SQL Server to identify objects
+		/// Used by SQL Server to identify tables and other top-level database objects
 		/// </summary>
 		public int ObjectId { get; set; }
+
+		/// <summary>
+		/// Used for things like sys.indexes.index_id or possibly sys.columns.column_id,
+		/// a value that makes an enumerated thing unique within an object
+		/// </summary>
+		public int InternalId { get; set; }
 
 		/// <summary>
 		/// Returns true if an object was modified and needs to be altered or rebuilt

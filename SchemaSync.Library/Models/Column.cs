@@ -12,8 +12,7 @@ namespace SchemaSync.Library.Models
 		public string Collation { get; set; }
 		public int MaxLength { get; set; }
 		public int Scale { get; set; }
-		public int Precision { get; set; }
-		public int Position { get; set; }
+		public int Precision { get; set; }		
 
 		public override IEnumerable<string> AlterCommands(SqlSyntax syntax)
 		{

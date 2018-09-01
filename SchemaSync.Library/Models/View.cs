@@ -7,17 +7,17 @@ namespace SchemaSync.Library.Models
 		public string Name { get; set; }
 		public string Body { get; set; }
 
-		public override IEnumerable<string> AlterCommands()
+		public override IEnumerable<string> AlterCommands(SqlSyntax syntax)
 		{
 			throw new System.NotImplementedException();
 		}
 
-		public override IEnumerable<string> CreateCommands()
+		public override IEnumerable<string> CreateCommands(SqlSyntax syntax)
 		{
 			yield return $"CREATE VIEW <{ToString()}\r\nAS\r\n{Body}";
 		}
 
-		public override IEnumerable<string> DropCommands()
+		public override IEnumerable<string> DropCommands(SqlSyntax syntax)
 		{
 			throw new System.NotImplementedException();
 		}

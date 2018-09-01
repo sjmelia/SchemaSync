@@ -9,18 +9,18 @@ namespace SchemaSync.Library.Models
 		public IEnumerable<Parameter> Parameters { get; set; } = Enumerable.Empty<Parameter>();
 		public string Body { get; set; }
 
-		public override IEnumerable<string> AlterCommands()
+		public override IEnumerable<string> AlterCommands(SqlSyntax syntax)
 		{
 			throw new System.NotImplementedException();
 		}
 
-		public override IEnumerable<string> CreateCommands()
+		public override IEnumerable<string> CreateCommands(SqlSyntax syntax)
 		{			
 			string parameters = string.Join("\r\n, ", Parameters.Select(p => p.ToString()));
 			yield return $"CREATE PROCEDURE <{ToString()}>\r\n{parameters}\r\nAS\r\n{Body}";
 		}
 
-		public override IEnumerable<string> DropCommands()
+		public override IEnumerable<string> DropCommands(SqlSyntax syntax)
 		{
 			throw new System.NotImplementedException();
 		}

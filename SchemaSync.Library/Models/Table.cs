@@ -9,11 +9,12 @@ namespace SchemaSync.Library.Models
 		public string Name { get; set; }
 		public string IdentityColumn { get; set; }
 		public string ClusteredIndex { get; set; }		
+		public int RowCount { get; set; }
 
 		/// <summary>
 		/// If empty, then it's okay to drop and rebuild table
 		/// </summary>
-		public bool IsEmpty { get; set; }
+		public bool IsEmpty { get { return RowCount == 0; } }
 
 		public IEnumerable<Column> Columns { get; set; } = Enumerable.Empty<Column>();
 		public IEnumerable<Index> Indexes { get; set; } = Enumerable.Empty<Index>();

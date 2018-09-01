@@ -53,7 +53,8 @@ namespace SchemaSync.SqlServer
 					SCHEMA_NAME([t].[schema_id]) AS [Schema], 
 					[t].[object_id] AS [ObjectId],
 					[c].[name] AS [ClusteredIndex],
-					[i].[name] AS [IdentityColumn]
+					[i].[name] AS [IdentityColumn],
+					(SELECT SUM(row_count) FROM [sys].[dm_db_partition_stats] WHERE [object_id]=[t].[object_id] AND [index_id] IN (0, 1)) AS [RowCount]
 				FROM 
 					[sys].[tables] [t]
 					LEFT JOIN [clusteredIndexes] [c] ON [t].[object_id]=[c].[object_id]

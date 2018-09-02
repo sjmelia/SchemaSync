@@ -59,7 +59,7 @@ namespace Tests
 		{
 			using (var cn = GetConnection())
 			{
-				var db = Database.FromConnection<SchemaSync.SqlServer.Database>(cn);
+				//var db = Database.LoadFromConnection<SchemaSync.SqlServer.Database>(cn);
 			}
 		}
 	}

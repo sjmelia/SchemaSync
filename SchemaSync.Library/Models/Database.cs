@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Data;
-using System.Linq;
 using System.Reflection;
 
 namespace SchemaSync.Library.Models
@@ -20,113 +19,47 @@ namespace SchemaSync.Library.Models
 		Tables = 1,
 		ForeignKeys = 2,
 		Procedures = 4,
-		Views = 8
+		Views = 8,
+		TablesAndForeignKeys = Tables | ForeignKeys,
+		All = Tables | ForeignKeys | Procedures | Views
 	}
 
 	public abstract class Database
 	{
-		public DatabaseSourceFlags Source { get; private set; }
+		public string Collation { get; set; }
 		public IEnumerable<Table> Tables { get; set; }
 		public IEnumerable<ForeignKey> ForeignKeys { get; set; }
 		public IEnumerable<Procedure> Procedures { get; set; }
 		public IEnumerable<View> Views { get; set; }
-		public string Collation { get; set; }
-
-		public Database()
-		{
-			Source = DatabaseSourceFlags.NotSet;
-		}
-
-		public SchemaComparison Compare(Database database)
-		{
-			var result = new SchemaComparison();
-			result.Create = CompareCreateObjects(database);
-			result.Alter = CompareAlterObjects(database);
-			result.Drop = CompareDropObjects(database);
-			return result;
-		}
-
-		private IEnumerable<DbObject> CompareCreateObjects(Database database)
-		{
-			List<DbObject> results = new List<DbObject>();
-
-			var newTables = Tables.Where(t => !database.Tables.Contains(t));
-			results.AddRange(newTables);
-
-			var matchingTables = Tables.Where(t => database.Tables.Contains(t));
-
-			var newColumns = matchingTables.SelectMany(t => t.Columns).Where(c => !database.Tables.SelectMany(t => t.Columns).Contains(c));
-			results.AddRange(newColumns);
-
-			var newForeignKeys = ForeignKeys.Where(fk => !database.ForeignKeys.Contains(fk));
-			results.AddRange(newForeignKeys);
-
-			// indexes
-
-			return results;
-		}
-
-		private IEnumerable<DbObject> CompareAlterObjects(Database database)
-		{
-			throw new NotImplementedException();
-		}
-
-		private IEnumerable<DbObject> CompareDropObjects(Database database)
-		{
-			throw new NotImplementedException();
-		}
 
 		#region static initializer methods
 
-		public static T FromConnection<T>(IDbConnection connection) where T : Database, new()
+		public void LoadFromConnection(IDbConnection connection, ObjectTypeFlags objectTypes = ObjectTypeFlags.TablesAndForeignKeys)
 		{
-			var db = new T();
-			if ((db.SupportedSources & DatabaseSourceFlags.Connection) == DatabaseSourceFlags.Connection)
-			{
-				db.Source = DatabaseSourceFlags.Connection;
-				if ((db.SupportedObjectTypes & ObjectTypeFlags.Tables) == ObjectTypeFlags.Tables) db.Tables = db.GetTables(connection);
-				if ((db.SupportedObjectTypes & ObjectTypeFlags.ForeignKeys) == ObjectTypeFlags.ForeignKeys) db.ForeignKeys = db.GetForeignKeys(connection);
-				if ((db.SupportedObjectTypes & ObjectTypeFlags.Procedures) == ObjectTypeFlags.Procedures) db.Procedures = db.GetProcedures(connection);
-				if ((db.SupportedObjectTypes & ObjectTypeFlags.Views) == ObjectTypeFlags.Views) db.Views = db.GetViews(connection);
-				return db;
-			}
-			else
-			{
-				throw new NotImplementedException("This Database doesn't implement an IDbConnection source.");
-			}
+			if ((objectTypes & ObjectTypeFlags.Tables) == ObjectTypeFlags.Tables) Tables = GetTables(connection);
+			if ((objectTypes & ObjectTypeFlags.ForeignKeys) == ObjectTypeFlags.ForeignKeys) ForeignKeys = GetForeignKeys(connection);
+			if ((objectTypes & ObjectTypeFlags.Procedures) == ObjectTypeFlags.Procedures) Procedures = GetProcedures(connection);
+			if ((objectTypes & ObjectTypeFlags.Views) == ObjectTypeFlags.Views) Views = GetViews(connection);
 		}
 
-		public static T FromAssembly<T>(string assemblyFile) where T : Database, new()
+		public void LoadFromAssembly(string path, ObjectTypeFlags objectTypes = ObjectTypeFlags.TablesAndForeignKeys)
 		{
-			var assembly = Assembly.LoadFile(assemblyFile);
-			return FromAssembly<T>(assembly);
+			var assembly = Assembly.LoadFile(path);
+			LoadFromAssembly(assembly, objectTypes);
 		}
 
-		public static T FromAssembly<T>(Assembly assembly) where T : Database, new()
+		public void LoadFromAssembly(Assembly assembly, ObjectTypeFlags objectTypes = ObjectTypeFlags.TablesAndForeignKeys)
 		{
-			var db = new T();
-			if ((db.SupportedSources & DatabaseSourceFlags.Assembly) == DatabaseSourceFlags.Assembly)
-			{
-				db.Source = DatabaseSourceFlags.Assembly;
-				var modelTypes = db.GetModelTypes(assembly);
-				if ((db.SupportedObjectTypes & ObjectTypeFlags.Tables) == ObjectTypeFlags.Tables) db.Tables = db.GetTables(modelTypes);
-				if ((db.SupportedObjectTypes & ObjectTypeFlags.ForeignKeys) == ObjectTypeFlags.ForeignKeys) db.ForeignKeys = db.GetForeignKeys(modelTypes);
-				if ((db.SupportedObjectTypes & ObjectTypeFlags.Procedures) == ObjectTypeFlags.Procedures) db.Procedures = db.GetProcedures(modelTypes);
-				if ((db.SupportedObjectTypes & ObjectTypeFlags.Views) == ObjectTypeFlags.Views) db.Views = db.GetViews(modelTypes);
-				return db;
-			}
-			else
-			{
-				throw new NotImplementedException("This Database doesn't implement an Assembly source.");
-			}
+			var modelTypes = GetModelTypes(assembly);
+			if ((objectTypes & ObjectTypeFlags.Tables) == ObjectTypeFlags.Tables) Tables = GetTables(modelTypes);
+			if ((objectTypes & ObjectTypeFlags.ForeignKeys) == ObjectTypeFlags.ForeignKeys) ForeignKeys = GetForeignKeys(modelTypes);
+			if ((objectTypes & ObjectTypeFlags.Procedures) == ObjectTypeFlags.Procedures) Procedures = GetProcedures(modelTypes);
+			if ((objectTypes & ObjectTypeFlags.Views) == ObjectTypeFlags.Views) Views = GetViews(modelTypes);
 		}
 
 		#endregion static initializer methods
 
 		#region object discovery abstract methods
-
-		protected abstract DatabaseSourceFlags SupportedSources { get; }
-		protected abstract ObjectTypeFlags SupportedObjectTypes { get; }
 
 		// connection-source
 		protected abstract IEnumerable<Table> GetTables(IDbConnection connection);

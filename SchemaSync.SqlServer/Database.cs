@@ -11,10 +11,6 @@ namespace SchemaSync.SqlServer
 {
 	public class Database : Library.Models.Database
 	{
-		protected override DatabaseSourceFlags SupportedSources => DatabaseSourceFlags.Assembly | DatabaseSourceFlags.Connection;
-
-		protected override ObjectTypeFlags SupportedObjectTypes => ObjectTypeFlags.Tables | ObjectTypeFlags.ForeignKeys;
-
 		protected override IEnumerable<Type> GetModelTypes(Assembly assembly)
 		{
 			throw new NotImplementedException();

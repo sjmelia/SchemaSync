@@ -1,7 +1,9 @@
-﻿using SchemaSync.SqlServer;
+﻿using SchemaSync.Library;
+using SchemaSync.SqlServer;
 using System;
 using System.Data.SqlClient;
 using System.IO;
+using System.Reflection;
 
 namespace ConsoleApp
 {
@@ -11,8 +13,10 @@ namespace ConsoleApp
 		{
 			using (var cn = GetConnection())
 			{
-				var db = new SqlServerDatabase(cn);
-				db.SaveScript(new SqlServerSyntax(), Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.Desktop), "Hs5Script.sql"));
+				var dbSource = new ConnectionProvider().GetDatabase(cn);
+				//var dbSource = new ConnectionProvider().GetDatabase(Assembly.LoadFile(@"C:\Users\Adam\Source\Repos\Hs5\Hs5.Models\bin\Debug\Hs5.Models.dll"));
+				//var dbDest = new ConnectionProvider(cn);				
+				//var diff = SchemaComparison.Execute(dbSource, dbDest);
 			}
 		}
 

@@ -7,9 +7,9 @@ using System.Linq;
 
 namespace SchemaSync.SqlServer
 {
-	public partial class SqlServerDatabase
+	public partial class ConnectionProvider
 	{
-		protected override IEnumerable<ForeignKey> GetForeignKeys(IDbConnection connection)
+		private IEnumerable<ForeignKey> GetForeignKeys(IDbConnection connection)
 		{
 			var foreignKeys = connection.Query<ForeignKeysResult>(
 				@"SELECT

@@ -59,7 +59,7 @@ namespace Tests
 		{
 			using (var cn = GetConnection())
 			{
-				var db = new SqlServerDatabase(cn);
+				var db = new ConnectionProvider(cn);
 			}
 		}
 	}

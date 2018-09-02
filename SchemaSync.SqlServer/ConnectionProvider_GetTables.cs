@@ -7,9 +7,9 @@ using System.Linq;
 
 namespace SchemaSync.SqlServer
 {
-	public partial class SqlServerDatabase
+	public partial class ConnectionProvider
 	{
-		protected override IEnumerable<Table> GetTables(IDbConnection connection)
+		private IEnumerable<Table> GetTables(IDbConnection connection)
 		{
 			var tables = connection.Query<Table>(
 				@"WITH [clusteredIndexes] AS (

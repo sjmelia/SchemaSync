@@ -36,7 +36,7 @@ namespace SchemaSync.Library.Models
 		public override IEnumerable<string> CreateCommands(SqlSyntax syntax)
 		{
 			string referencingColumns = string.Join(", ", Columns.Select(col => $"<{col.ReferencingName}>"));
-			string referencedColumns = string.Join(", ", Columns.Select(col => $"<{col.ReferencedName}"));
+			string referencedColumns = string.Join(", ", Columns.Select(col => $"<{col.ReferencedName}>"));
 
 			string cmd = $"ALTER TABLE <{ReferencingTable}> ADD CONSTRAINT <{Name}> FOREIGN KEY ({referencingColumns}) REFERENCES <{ReferencedTable}> ({referencedColumns})";
 			if (CascadeUpdate) cmd += " ON UPDATE CASCADE";

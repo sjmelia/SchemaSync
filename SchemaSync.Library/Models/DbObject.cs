@@ -32,7 +32,8 @@ namespace SchemaSync.Library.Models
 		public abstract IEnumerable<string> DropCommands(SqlSyntax syntax);
 
 		/// <summary>
-		/// Generates the SQL ALTER statement(s) for an object
+		/// Generates the SQL ALTER statement(s) for an object.
+		/// Default action is to delete and rebuild the object
 		/// </summary>
 		public virtual IEnumerable<string> AlterCommands(SqlSyntax syntax)
 		{

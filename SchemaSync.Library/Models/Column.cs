@@ -46,7 +46,7 @@ namespace SchemaSync.Library.Models
 
 		internal string Definition(SqlSyntax syntax)
 		{
-			string identity = (Table.IdentityColumn.Equals(Name)) ? $" {syntax.IdentitySyntax}" : string.Empty;
+			string identity = (Table.IdentityColumn?.Equals(Name) ?? false) ? $" {syntax.IdentitySyntax}" : string.Empty;
 			string result = $"<{Name}> {syntax.GetDataTypeDefinition(this)}{identity} {((IsNullable) ? "NULL" : "NOT NULL")}";
 			if (!string.IsNullOrEmpty(Default)) result += $" DEFAULT ({Default})";
 			return result;

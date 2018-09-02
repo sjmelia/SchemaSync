@@ -27,7 +27,7 @@ namespace SchemaSync.Library.Models
 		public override IEnumerable<string> CreateCommands(SqlSyntax syntax)
 		{
 			string columns = string.Join(",\r\n", Columns.OrderBy(col => col.InternalId).Select(col => $"\t{col.Definition(syntax)}"));
-			yield return $"CREATE TABLE <{ToString()}> (\r\n{columns})";
+			yield return $"CREATE TABLE <{ToString()}> (\r\n{columns}\r\n)";
 
 			foreach (var index in Indexes)
 			{

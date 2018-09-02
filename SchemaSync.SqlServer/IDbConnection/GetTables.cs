@@ -57,7 +57,7 @@ namespace SchemaSync.SqlServer
 					END) AS [IsClustered],
 					CASE
 						WHEN [x].[is_primary_key]=1 THEN 1
-						WHEN [x].[is_unique]=1 THEN 2
+						WHEN [x].[is_unique]=1 AND [x].[is_unique_constraint]=0 THEN 2
 						WHEN [x].[is_unique_constraint]=1 THEN 3
 						WHEN [x].[is_unique]=0 THEN 4
 					END AS [Type],
@@ -102,7 +102,10 @@ namespace SchemaSync.SqlServer
 			foreach (var t in tables)
 			{
 				t.Columns = columnLookup[t.ObjectId].ToArray();
+				foreach (var col in t.Columns) col.Table = t;
+
 				t.Indexes = indexLookup[t.ObjectId].ToArray();
+				foreach (var x in t.Indexes) x.Table = t;
 			}
 
 			return tables;

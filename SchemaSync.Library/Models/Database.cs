@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Data;
+using System.IO;
 using System.Reflection;
 
 namespace SchemaSync.Library.Models
@@ -74,5 +75,21 @@ namespace SchemaSync.Library.Models
 		protected abstract IEnumerable<View> GetViews(IEnumerable<Type> modelTypes);
 
 		#endregion object discovery abstract methods
+
+		public void SaveScript(SqlSyntax syntax, string path)
+		{
+			using (var file = File.CreateText(path))
+			{
+				foreach (var t in Tables) WriteCommands(syntax, file, t);
+
+				foreach (var fk in ForeignKeys) WriteCommands(syntax, file, fk);
+			}
+		}
+
+		private static void WriteCommands(SqlSyntax syntax, StreamWriter file, DbObject @object)
+		{
+			foreach (var cmd in @object.CreateCommands(syntax)) file.Write("\n" + cmd);
+			file.WriteLine("\n" + syntax.BatchSeparator);
+		}
 	}
 }

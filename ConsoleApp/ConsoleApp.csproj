@@ -4,15 +4,17 @@
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{1944A83D-0CE9-4DBE-BFDE-4618AEA4FE66}</ProjectGuid>
-    <OutputType>Library</OutputType>
-    <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>SchemaSync.SqlServer</RootNamespace>
-    <AssemblyName>SchemaSync.SqlServer</AssemblyName>
+    <ProjectGuid>{7675CEFE-6D55-4E65-A3B8-57D7C0FE9762}</ProjectGuid>
+    <OutputType>Exe</OutputType>
+    <RootNamespace>ConsoleApp</RootNamespace>
+    <AssemblyName>ConsoleApp</AssemblyName>
     <TargetFrameworkVersion>v4.6.1</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
+    <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
+    <Deterministic>true</Deterministic>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <PlatformTarget>AnyCPU</PlatformTarget>
     <DebugSymbols>true</DebugSymbols>
     <DebugType>full</DebugType>
     <Optimize>false</Optimize>
@@ -22,6 +24,7 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <PlatformTarget>AnyCPU</PlatformTarget>
     <DebugType>pdbonly</DebugType>
     <Optimize>true</Optimize>
     <OutputPath>bin\Release\</OutputPath>
@@ -30,9 +33,6 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="Dapper, Version=1.50.5.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\Dapper.1.50.5\lib\net451\Dapper.dll</HintPath>
-    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="System.Xml.Linq" />
@@ -43,22 +43,21 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="IDbConnection\GetForeignKeys.cs" />
-    <Compile Include="IDbConnection\GetTables.cs" />
-    <Compile Include="Models\ForeignKeysResult.cs" />
-    <Compile Include="SqlServerDatabase.cs" />
-    <Compile Include="Models\IndexColumnResult.cs" />
+    <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="SqlServerSyntax.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="App.config" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\SchemaSync.Library\SchemaSync.Library.csproj">
       <Project>{551bdc7a-9001-427a-bb3a-05dfa1e855c7}</Project>
       <Name>SchemaSync.Library</Name>
     </ProjectReference>
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="packages.config" />
+    <ProjectReference Include="..\SchemaSync.SqlServer\SchemaSync.SqlServer.csproj">
+      <Project>{1944a83d-0ce9-4dbe-bfde-4618aea4fe66}</Project>
+      <Name>SchemaSync.SqlServer</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

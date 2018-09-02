@@ -6,14 +6,6 @@ using System.Reflection;
 namespace SchemaSync.Library.Models
 {
 	[Flags]
-	public enum DatabaseSourceFlags
-	{
-		NotSet = 0,
-		Connection = 1,
-		Assembly = 2
-	}
-
-	[Flags]
 	public enum ObjectTypeFlags
 	{
 		Tables = 1,
@@ -31,8 +23,6 @@ namespace SchemaSync.Library.Models
 		public IEnumerable<ForeignKey> ForeignKeys { get; set; }
 		public IEnumerable<Procedure> Procedures { get; set; }
 		public IEnumerable<View> Views { get; set; }
-
-		#region static initializer methods
 
 		public void LoadFromConnection(IDbConnection connection, ObjectTypeFlags objectTypes = ObjectTypeFlags.TablesAndForeignKeys)
 		{
@@ -56,8 +46,6 @@ namespace SchemaSync.Library.Models
 			if ((objectTypes & ObjectTypeFlags.Procedures) == ObjectTypeFlags.Procedures) Procedures = GetProcedures(modelTypes);
 			if ((objectTypes & ObjectTypeFlags.Views) == ObjectTypeFlags.Views) Views = GetViews(modelTypes);
 		}
-
-		#endregion static initializer methods
 
 		#region object discovery abstract methods
 

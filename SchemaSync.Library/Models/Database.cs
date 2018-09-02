@@ -40,7 +40,7 @@ namespace SchemaSync.Library.Models
 
 		public void LoadFromAssembly(Assembly assembly, ObjectTypeFlags objectTypes = ObjectTypeFlags.TablesAndForeignKeys)
 		{
-			var modelTypes = GetModelTypes(assembly);
+			var modelTypes = GetModelTypes(assembly.GetTypes());
 			if ((objectTypes & ObjectTypeFlags.Tables) == ObjectTypeFlags.Tables) Tables = GetTables(modelTypes);
 			if ((objectTypes & ObjectTypeFlags.ForeignKeys) == ObjectTypeFlags.ForeignKeys) ForeignKeys = GetForeignKeys(modelTypes);
 			if ((objectTypes & ObjectTypeFlags.Procedures) == ObjectTypeFlags.Procedures) Procedures = GetProcedures(modelTypes);
@@ -59,7 +59,7 @@ namespace SchemaSync.Library.Models
 		protected abstract IEnumerable<View> GetViews(IDbConnection connection);
 
 		// assembly source
-		protected abstract IEnumerable<Type> GetModelTypes(Assembly assembly);
+		protected abstract IEnumerable<Type> GetModelTypes(IEnumerable<Type> assemblyTypes);
 
 		protected abstract IEnumerable<Table> GetTables(IEnumerable<Type> modelTypes);
 

@@ -9,9 +9,23 @@ using System.Reflection;
 
 namespace SchemaSync.SqlServer
 {
-	public class Database : Library.Models.Database
+	public class SqlServerDatabase : Database
 	{
-		protected override IEnumerable<Type> GetModelTypes(Assembly assembly)
+		public SqlServerDatabase()
+		{
+		}
+
+		public SqlServerDatabase(Assembly assembly, ObjectTypeFlags objectTypes = ObjectTypeFlags.TablesAndForeignKeys)
+		{
+			LoadFromAssembly(assembly, objectTypes);
+		}
+
+		public SqlServerDatabase(IDbConnection connection, ObjectTypeFlags objectTypes = ObjectTypeFlags.TablesAndForeignKeys)
+		{
+			LoadFromConnection(connection, objectTypes);
+		}
+
+		protected override IEnumerable<Type> GetModelTypes(IEnumerable<Type> assemblyTypes)
 		{
 			throw new NotImplementedException();
 		}
@@ -65,7 +79,7 @@ namespace SchemaSync.SqlServer
 					[col].[collation_name] AS [Collation],
 					[col].[max_length] AS [MaxLength],
 					[col].[precision] AS [Precision],
-					[col].[scale] AS [Scale],					
+					[col].[scale] AS [Scale],
 					[col].[column_id] AS [InternalId]
 				FROM
 					[sys].[columns] [col]
@@ -97,13 +111,13 @@ namespace SchemaSync.SqlServer
 					[x].[type]<>0");
 
 			var indexCols = connection.Query<IndexColumnResult>(
-				@"SELECT 
-					[xcol].[object_id], 
-					[xcol].[index_id], 
+				@"SELECT
+					[xcol].[object_id],
+					[xcol].[index_id],
 					[col].[name],
-					[xcol].[key_ordinal],   
-					[xcol].[is_descending_key]  
-				FROM 
+					[xcol].[key_ordinal],
+					[xcol].[is_descending_key]
+				FROM
 					[sys].[index_columns] [xcol]
 					INNER JOIN [sys].[indexes] [x] ON [xcol].[object_id]=[x].[object_id] AND [xcol].[index_id]=[x].[index_id]
 					INNER JOIN [sys].[columns] [col] ON [xcol].[object_id]=[col].[object_id] AND [xcol].[column_id]=[col].[column_id]

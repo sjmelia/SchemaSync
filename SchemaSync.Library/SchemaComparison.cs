@@ -13,9 +13,16 @@ namespace SchemaSync.Library
 			Destination = destination;
 		}
 
+		public static SchemaComparison Execute(Database source, Database destination)
+		{
+			var sc = new SchemaComparison(source, destination);
+			sc.Execute();
+			return sc;
+		}
+
 		public void Execute()
 		{
-
+			Create = CompareCreateObjects(Source, Destination);
 		}
 
 		public Database Source { get; private set; }

@@ -27,7 +27,9 @@ namespace SchemaSync.Library.Models
 
 		public override IEnumerable<string> AlterCommands(SqlSyntax syntax)
 		{
-			throw new System.NotImplementedException();
+			foreach (var cmd in DropCommands(syntax)) yield return cmd;
+
+			foreach (var cmd in CreateCommands(syntax)) yield return cmd;
 		}
 
 		public override IEnumerable<string> CreateCommands(SqlSyntax syntax)

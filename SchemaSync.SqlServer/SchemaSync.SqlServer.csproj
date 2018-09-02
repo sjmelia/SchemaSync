@@ -43,7 +43,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Database.cs" />
+    <Compile Include="SqlServerDatabase.cs" />
     <Compile Include="Models\IndexColumnResult.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>

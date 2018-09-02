@@ -7,6 +7,7 @@ using Dapper;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Postulate.Lite.Core.Extensions;
 using SchemaSync.Library.Models;
+using SchemaSync.SqlServer;
 
 namespace Tests
 {
@@ -59,7 +60,7 @@ namespace Tests
 		{
 			using (var cn = GetConnection())
 			{
-				//var db = Database.LoadFromConnection<SchemaSync.SqlServer.Database>(cn);
+				var db = new SqlServerDatabase(cn);				
 			}
 		}
 	}

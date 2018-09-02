@@ -43,6 +43,8 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="IDbConnection\GetForeignKeys.cs" />
+    <Compile Include="IDbConnection\GetTables.cs" />
     <Compile Include="SqlServerDatabase.cs" />
     <Compile Include="Models\IndexColumnResult.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

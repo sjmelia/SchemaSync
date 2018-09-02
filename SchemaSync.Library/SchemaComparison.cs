@@ -39,7 +39,9 @@ namespace SchemaSync.Library
 			var newTables = source.Tables.Where(t => !destination.Tables.Contains(t));
 			results.AddRange(newTables);
 
-			var matchingTables = source.Tables.Where(t => destination.Tables.Contains(t));
+			var matchingTables = from s in source.Tables
+								 join d in destination.Tables on s equals d
+								 select s;
 
 			var newColumns = matchingTables.SelectMany(t => t.Columns).Where(c => !destination.Tables.SelectMany(t => t.Columns).Contains(c));
 			results.AddRange(newColumns);

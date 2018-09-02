@@ -1,13 +1,12 @@
-﻿using System;
+﻿using Dapper;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
+using Postulate.Lite.Core.Extensions;
+using SchemaSync.SqlServer;
+using System;
 using System.Data.SqlClient;
 using System.Diagnostics;
 using System.IO;
 using System.Reflection;
-using Dapper;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
-using Postulate.Lite.Core.Extensions;
-using SchemaSync.Library.Models;
-using SchemaSync.SqlServer;
 
 namespace Tests
 {
@@ -29,7 +28,7 @@ namespace Tests
 				if (cn.Exists("[sys].[databases] WHERE [name]=@name", new { name = dbName }))
 				{
 					cn.Execute($"DROP DATABASE [{dbName}]");
-				}			
+				}
 			}
 
 			string bacpac = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "Hs5.bacpac");
@@ -60,7 +59,7 @@ namespace Tests
 		{
 			using (var cn = GetConnection())
 			{
-				var db = new SqlServerDatabase(cn);				
+				var db = new SqlServerDatabase(cn);
 			}
 		}
 	}

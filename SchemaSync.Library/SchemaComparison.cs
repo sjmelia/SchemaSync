@@ -23,6 +23,8 @@ namespace SchemaSync.Library
 		public void Execute()
 		{
 			Create = CompareCreateObjects(Source, Destination);
+			//Alter = ...
+			//Drop =
 		}
 
 		public Database Source { get; private set; }

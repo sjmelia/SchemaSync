@@ -25,13 +25,6 @@ namespace SchemaSync.Library.Models
 		public bool IsClustered { get; set; }
 		public IEnumerable<IndexColumn> Columns { get; set; }
 
-		public override IEnumerable<string> AlterCommands(SqlSyntax syntax)
-		{
-			foreach (var cmd in DropCommands(syntax)) yield return cmd;
-
-			foreach (var cmd in CreateCommands(syntax)) yield return cmd;
-		}
-
 		public override IEnumerable<string> CreateCommands(SqlSyntax syntax)
 		{
 			string columnList = string.Join(", ", Columns.OrderBy(col => col.Position).Select(col => $"<{col.Name}> {((col.SortDirection == SortDirection.Ascending) ? "ASC" : "DESC")}"));

@@ -34,7 +34,11 @@ namespace SchemaSync.Library.Models
 		/// <summary>
 		/// Generates the SQL ALTER statement(s) for an object
 		/// </summary>
-		public abstract IEnumerable<string> AlterCommands(SqlSyntax syntax);
+		public virtual IEnumerable<string> AlterCommands(SqlSyntax syntax)
+		{
+			foreach (var cmd in DropCommands(syntax)) yield return cmd;
+			foreach (var cmd in CreateCommands(syntax)) yield return cmd;
+		}
 
 		/// <summary>
 		/// Override this to get the dependencies of an object that must be dropped and created whenever rebuilding this object

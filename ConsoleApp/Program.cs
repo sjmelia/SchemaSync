@@ -1,5 +1,4 @@
-﻿using SchemaSync.Library.Models;
-using SchemaSync.SqlServer;
+﻿using SchemaSync.SqlServer;
 using System;
 using System.Data.SqlClient;
 using System.IO;

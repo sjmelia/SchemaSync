@@ -9,11 +9,6 @@ namespace SchemaSync.Library.Models
 		public IEnumerable<Parameter> Parameters { get; set; } = Enumerable.Empty<Parameter>();
 		public string Body { get; set; }
 
-		public override IEnumerable<string> AlterCommands(SqlSyntax syntax)
-		{
-			throw new System.NotImplementedException();
-		}
-
 		public override IEnumerable<string> CreateCommands(SqlSyntax syntax)
 		{			
 			string parameters = string.Join("\r\n, ", Parameters.Select(p => p.ToString()));
@@ -22,7 +17,7 @@ namespace SchemaSync.Library.Models
 
 		public override IEnumerable<string> DropCommands(SqlSyntax syntax)
 		{
-			throw new System.NotImplementedException();
+			yield return $"DROP PROCEDURE <{Name}>";
 		}
 
 		public override bool IsAltered(object compare)

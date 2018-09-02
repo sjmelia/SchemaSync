@@ -80,6 +80,12 @@ namespace SchemaSync.Library.Models
 		{
 			using (var file = File.CreateText(path))
 			{
+				foreach (var cmd in syntax.DatabaseCommands(this))
+				{
+					WriteCommand(syntax, file, cmd);
+					EndBatch(syntax, file);
+				}
+
 				foreach (var t in Tables) WriteCommands(syntax, file, t);
 
 				foreach (var fk in ForeignKeys) WriteCommands(syntax, file, fk);
@@ -88,8 +94,18 @@ namespace SchemaSync.Library.Models
 
 		private static void WriteCommands(SqlSyntax syntax, StreamWriter file, DbObject @object)
 		{
-			foreach (var cmd in @object.CreateCommands(syntax)) file.Write("\n" + cmd);
+			foreach (var cmd in @object.CreateCommands(syntax)) WriteCommand(syntax, file, cmd);
+			EndBatch(syntax, file);
+		}
+
+		private static void EndBatch(SqlSyntax syntax, StreamWriter file)
+		{
 			file.WriteLine("\n" + syntax.BatchSeparator);
+		}
+
+		private static void WriteCommand(SqlSyntax syntax, StreamWriter file, string cmd)
+		{
+			file.Write("\n" + syntax.ApplyDelimiters(cmd));
 		}
 	}
 }

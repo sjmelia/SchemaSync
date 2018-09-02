@@ -1,5 +1,7 @@
 ﻿using SchemaSync.Library.Models;
 using System;
+using System.Collections.Generic;
+using System.Data;
 using System.Linq;
 using System.Text.RegularExpressions;
 
@@ -55,6 +57,14 @@ namespace SchemaSync.Library
 				result = result.Replace(name.Value, delimitedName);
 			}
 			return result;
+		}
+
+		/// <summary>
+		/// Override this to inject any database-level commands into a script, such as schema creation
+		/// </summary>
+		public virtual IEnumerable<string> DatabaseCommands(Database database)
+		{
+			return Enumerable.Empty<string>();
 		}
 	}
 }

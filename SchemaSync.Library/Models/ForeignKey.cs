@@ -38,7 +38,7 @@ namespace SchemaSync.Library.Models
 			string referencingColumns = string.Join(", ", Columns.Select(col => $"<{col.ReferencingName}>"));
 			string referencedColumns = string.Join(", ", Columns.Select(col => $"<{col.ReferencedName}>"));
 
-			string cmd = $"ALTER TABLE <{ReferencingTable}> ADD CONSTRAINT <{Name}> FOREIGN KEY ({referencingColumns}) REFERENCES <{ReferencedTable}> ({referencedColumns})";
+			string cmd = $"ALTER TABLE <{ReferencingTable}> ADD CONSTRAINT <{Name}> FOREIGN KEY (\r\n\t{referencingColumns}\r\n) REFERENCES <{ReferencedTable}> (\r\n\t{referencedColumns}\r\n)";
 			if (CascadeUpdate) cmd += " ON UPDATE CASCADE";
 			if (CascadeDelete) cmd += " ON DELETE CASCADE";
 			yield return cmd;

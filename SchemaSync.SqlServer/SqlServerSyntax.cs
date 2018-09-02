@@ -1,6 +1,10 @@
-﻿using SchemaSync.Library;
+﻿using Dapper;
+using SchemaSync.Library;
 using SchemaSync.Library.Models;
 using System;
+using System.Collections.Generic;
+using System.Data;
+using System.Linq;
 
 namespace SchemaSync.SqlServer
 {
@@ -21,7 +25,7 @@ namespace SchemaSync.SqlServer
 
 			if (result.StartsWith("nvar") || result.StartsWith("var"))
 			{
-				result += $"({column.MaxLength / lengthDivisor})";
+				result += (column.MaxLength > -1) ? $"({column.MaxLength / lengthDivisor})" : "(max)";
 			}
 
 			if (result.Equals("decimal"))
@@ -30,6 +34,16 @@ namespace SchemaSync.SqlServer
 			}
 
 			return result;
+		}
+
+		public override IEnumerable<string> DatabaseCommands(Database database)
+		{
+			var schemas = database.Tables.Select(t => t.Schema).GroupBy(s => s).Select(grp => grp.Key).ToArray();
+
+			foreach (string schema in schemas)
+			{
+				yield return $"-- uncomment this next line as needed\r\n-- CREATE SCHEMA [{schema}]";
+			}
 		}
 	}
 }

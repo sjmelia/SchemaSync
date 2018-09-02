@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
 
 namespace SchemaSync.Library.Models
 {
@@ -6,18 +7,38 @@ namespace SchemaSync.Library.Models
 	{
 		public string Name { get; set; }
 		public Table ReferencedTable { get; set; }
-		public Column ReferencingColumn { get; set; }
+		public Table ReferencingTable { get; set; }
+		public IEnumerable<Column> Columns { get; set; }
 		public bool CascadeDelete { get; set; }
 		public bool CascadeUpdate { get; set; }
-
-		public override IEnumerable<string> AlterCommands(SqlSyntax syntax)
+		
+		public class Column
 		{
-			throw new System.NotImplementedException();
+			public string ReferencedName { get; set; }
+			public string ReferencingName { get; set; }
+
+			public override bool Equals(object obj)
+			{
+				Column col = obj as Column;
+				if (col != null)
+				{
+					return col.ReferencedName.ToLower().Equals(ReferencedName.ToLower()) && col.ReferencingName.ToLower().Equals(ReferencingName.ToLower());
+				}
+				return false;
+			}
+
+			public override int GetHashCode()
+			{
+				return ReferencedName.ToLower().GetHashCode() + ReferencingName.ToLower().GetHashCode();
+			}
 		}
 
 		public override IEnumerable<string> CreateCommands(SqlSyntax syntax)
 		{
-			string cmd = $"ALTER TABLE <{ReferencingColumn.Table}> ADD CONSTRAINT <{Name}> FOREIGN KEY (<{ReferencingColumn.Name}>) REFERENCES <{ReferencedTable}> (<{ReferencedTable.IdentityColumn}>)";
+			string referencingColumns = string.Join(", ", Columns.Select(col => $"<{col.ReferencingName}>"));
+			string referencedColumns = string.Join(", ", Columns.Select(col => $"<{col.ReferencedName}"));
+
+			string cmd = $"ALTER TABLE <{ReferencingTable}> ADD CONSTRAINT <{Name}> FOREIGN KEY ({referencingColumns}) REFERENCES <{ReferencedTable}> ({referencedColumns})";
 			if (CascadeUpdate) cmd += " ON UPDATE CASCADE";
 			if (CascadeDelete) cmd += " ON DELETE CASCADE";
 			yield return cmd;
@@ -38,7 +59,10 @@ namespace SchemaSync.Library.Models
 			ForeignKey fk = obj as ForeignKey;
 			if (fk != null)
 			{
-				return fk.ReferencedTable.Equals(ReferencedTable) && fk.ReferencingColumn.Equals(ReferencingColumn);
+				return
+					fk.ReferencedTable.Equals(ReferencedTable) &&
+					fk.ReferencingTable.Equals(ReferencingTable) &&
+					fk.Columns.SequenceEqual(Columns);
 			}
 
 			return false;
@@ -46,7 +70,7 @@ namespace SchemaSync.Library.Models
 
 		public override int GetHashCode()
 		{
-			return ReferencedTable.GetHashCode() + ReferencingColumn.GetHashCode();
+			return Name.GetHashCode();
 		}
 	}
 }

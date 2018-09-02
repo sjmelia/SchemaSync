@@ -35,6 +35,11 @@ namespace SchemaSync.Library
 		public abstract string GetDataTypeDefinition(Column column);
 
 		/// <summary>
+		/// For example GO in T-SQL
+		/// </summary>
+		public abstract string BatchSeparator { get; }
+
+		/// <summary>
 		/// Applies start and end object name delimiters around names marked with open and close brackets in the specified input
 		/// </summary>
 		public string ApplyDelimiters(string input)

@@ -29,6 +29,11 @@ namespace SchemaSync.Library.Models
 			yield return $"ALTER TABLE <{Table}> DROP COLUMN <{Name}>";
 		}
 
+		public override string ToString()
+		{
+			return Name;
+		}
+
 		public override bool Equals(object obj)
 		{
 			Column col = obj as Column;

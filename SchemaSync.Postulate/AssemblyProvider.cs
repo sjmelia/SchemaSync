@@ -41,12 +41,12 @@ namespace SchemaSync.Postulate
 
 		private string GetClusteredIndex(Type t)
 		{
-			throw new NotImplementedException();
+			return $"PK_{GetConstraintName(t)}";
 		}
 
 		private IEnumerable<Index> GetIndexes(Type t)
 		{
-			string constraintName = GetTableSchema(t) + GetTableName(t);
+			string constraintName = GetConstraintName(t);
 			string identityCol = GetIdentityColumn(t);
 
 			var pkColumns = GetMappedColumns(t).Where(pi => pi.HasAttribute<PrimaryKeyAttribute>());
@@ -58,12 +58,12 @@ namespace SchemaSync.Postulate
 					Type = IndexType.PrimaryKey,
 					Columns = pkColumns.Select((pi, i) => new IndexColumn() { Name = GetColumnName(pi), Position = i })
 				};
-				
+
 				yield return new Index()
 				{
 					Name = $"U_{constraintName}_{identityCol}",
 					Type = IndexType.UniqueConstraint,
-					Columns = new IndexColumn[] { new IndexColumn() {  Name = identityCol, Position = 1 } }
+					Columns = new IndexColumn[] { new IndexColumn() { Name = identityCol, Position = 1 } }
 				};
 			}
 			else
@@ -75,6 +75,11 @@ namespace SchemaSync.Postulate
 					Columns = new IndexColumn[] { new IndexColumn() { Name = identityCol, Position = 1 } }
 				};
 			}
+		}
+
+		private string GetConstraintName(Type t)
+		{
+			return GetTableSchema(t) + GetTableName(t);
 		}
 
 		private IEnumerable<PropertyInfo> GetMappedColumns(Type t)
@@ -94,7 +99,11 @@ namespace SchemaSync.Postulate
 
 		private Column ColumnFromProperty(PropertyInfo pi)
 		{
-			throw new NotImplementedException();
+			return new Column()
+			{
+				Name = GetColumnName(pi),
+				DataType = "whatever"
+			};
 		}
 
 		private string GetIdentityColumn(Type t)

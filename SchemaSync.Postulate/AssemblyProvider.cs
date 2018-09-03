@@ -10,33 +10,43 @@ using System.Reflection;
 
 namespace SchemaSync.Postulate
 {
-	public class AssemblyProvider : IDbProviderFromAssembly
+	public class AssemblyProvider<T> : IDbProviderFromAssembly
 	{
+		//private SqlServerProvider<T> _provider = new SqlServerProvider<T>();
+
 		public ObjectTypeFlags ObjectTypes => ObjectTypeFlags.Tables | ObjectTypeFlags.ForeignKeys;
 
 		public Database GetDatabase(Assembly assembly)
 		{
 			var types = assembly.GetExportedTypes();
 
+			var typeTableMap = GetTypeTableDictionary(types);
+
 			var db = new Database();
-			db.Tables = GetTables(types);
-			db.ForeignKeys = GetForeignKeys(db.Tables);
+			db.Tables = typeTableMap.Select(kp => kp.Value);
+			db.ForeignKeys = GetForeignKeys(typeTableMap);
 			return db;
 		}
 
-		private IEnumerable<Table> GetTables(Type[] types)
+		private Dictionary<Type, Table> GetTypeTableDictionary(Type[] types)
 		{
-			return types
+			var source = types
 				.Where(t => !t.HasAttribute<NotMappedAttribute>())
-				.Select(t => new Table()
+				.Select(t => new
 				{
-					Schema = GetTableSchema(t),
-					Name = GetTableName(t),
-					IdentityColumn = GetIdentityColumn(t),
-					Columns = GetColumns(t),
-					Indexes = GetIndexes(t),
-					ClusteredIndex = GetClusteredIndex(t)
+					Type = t,
+					Table = new Table()
+					{
+						Schema = GetTableSchema(t),
+						Name = GetTableName(t),
+						IdentityColumn = t.GetIdentityName(),
+						Columns = GetColumns(t),
+						Indexes = GetIndexes(t),
+						ClusteredIndex = GetClusteredIndex(t)
+					}
 				});
+
+			return source.ToDictionary(row => row.Type, row => row.Table);
 		}
 
 		private string GetClusteredIndex(Type t)
@@ -47,7 +57,7 @@ namespace SchemaSync.Postulate
 		private IEnumerable<Index> GetIndexes(Type t)
 		{
 			string constraintName = GetConstraintName(t);
-			string identityCol = GetIdentityColumn(t);
+			string identityCol = t.GetIdentityName();
 
 			var pkColumns = GetMappedColumns(t).Where(pi => pi.HasAttribute<PrimaryKeyAttribute>());
 			if (pkColumns.Any())
@@ -116,7 +126,7 @@ namespace SchemaSync.Postulate
 			catch (Exception exc)
 			{
 				throw new Exception($"Couldn't determine the Identity column of type {t.Name}, and property named '{defaultIdentity}' not found.", exc);
-			}			
+			}
 		}
 
 		private string GetTableName(Type t)
@@ -129,9 +139,25 @@ namespace SchemaSync.Postulate
 			return (t.HasAttribute(out TableAttribute attr, (a) => !string.IsNullOrEmpty(a.Schema))) ? attr.Schema : string.Empty;
 		}
 
-		private IEnumerable<ForeignKey> GetForeignKeys(IEnumerable<Table> tables)
+		private IEnumerable<ForeignKey> GetForeignKeys(Dictionary<Type, Table> typesAndTables)
 		{
-			throw new NotImplementedException();
+			return typesAndTables.Select(kp => kp.Key)
+				.SelectMany(t => t.GetProperties()
+					.Where(pi => pi.HasAttribute<ReferencesAttribute>()))
+					.Select(pi => ForeignKeyFromProperty(typesAndTables, pi));
+		}
+
+		private ForeignKey ForeignKeyFromProperty(Dictionary<Type, Table> typesAndTables, PropertyInfo pi)
+		{
+			var fk = pi.GetCustomAttribute<ReferencesAttribute>();
+			return new ForeignKey()
+			{
+				Name = $"FK_{GetConstraintName(pi.DeclaringType)}_{pi.GetColumnName()}",
+				CascadeDelete = fk.CascadeDelete,
+				ReferencedTable = typesAndTables[fk.PrimaryType],
+				ReferencingTable = typesAndTables[pi.DeclaringType],
+				Columns = new ForeignKey.Column[] { new ForeignKey.Column() { ReferencingName = pi.GetColumnName(), ReferencedName = pi.DeclaringType.GetIdentityName() } }
+			};
 		}
 	}
 }

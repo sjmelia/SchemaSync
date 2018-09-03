@@ -26,7 +26,10 @@ namespace SchemaSync.SqlServer
 				FROM
 					[sys].[tables] [t]
 					LEFT JOIN [clusteredIndexes] [c] ON [t].[object_id]=[c].[object_id]
-					LEFT JOIN [identityColumns] [i] ON [t].[object_id]=[i].[object_id]");
+					LEFT JOIN [identityColumns] [i] ON [t].[object_id]=[i].[object_id]
+				WHERE
+					([t].[name] NOT LIKE 'AspNet%' OR [t].[name] LIKE 'AspNetUsers') AND
+					[t].[name] NOT LIKE '__MigrationHistory'");
 
 			var columns = connection.Query<Column>(
 				@"SELECT

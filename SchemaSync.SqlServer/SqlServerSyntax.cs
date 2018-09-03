@@ -1,7 +1,5 @@
-﻿using Dapper;
-using SchemaSync.Library;
+﻿using SchemaSync.Library;
 using SchemaSync.Library.Models;
-using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Linq;

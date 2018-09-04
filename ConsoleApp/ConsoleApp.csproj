@@ -54,6 +54,10 @@
       <Project>{551bdc7a-9001-427a-bb3a-05dfa1e855c7}</Project>
       <Name>SchemaSync.Library</Name>
     </ProjectReference>
+    <ProjectReference Include="..\SchemaSync.Postulate\SchemaSync.Postulate.csproj">
+      <Project>{c005334e-6899-45cd-ab2a-e9fee2e90190}</Project>
+      <Name>SchemaSync.Postulate</Name>
+    </ProjectReference>
     <ProjectReference Include="..\SchemaSync.SqlServer\SchemaSync.SqlServer.csproj">
       <Project>{1944a83d-0ce9-4dbe-bfde-4618aea4fe66}</Project>
       <Name>SchemaSync.SqlServer</Name>

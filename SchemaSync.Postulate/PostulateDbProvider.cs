@@ -1,20 +1,28 @@
 ﻿using Postulate.Lite.Core.Attributes;
 using Postulate.Lite.Core.Extensions;
+using Postulate.Lite.SqlServer;
 using SchemaSync.Library.Interfaces;
 using SchemaSync.Library.Models;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
 using System.Reflection;
 
 namespace SchemaSync.Postulate
 {
-	public class AssemblyProvider<T> : IDbProviderFromAssembly
-	{
-		//private SqlServerProvider<T> _provider = new SqlServerProvider<T>();
+	public class PostulateDbProvider : IDbProviderFromAssembly
+	{		
+		private SqlServerIntegrator _integrator = new SqlServerIntegrator();
 
 		public ObjectTypeFlags ObjectTypes => ObjectTypeFlags.Tables | ObjectTypeFlags.ForeignKeys;
+
+		public Database GetDatabase(string path)
+		{
+			var assembly = Assembly.LoadFrom(path);
+			return GetDatabase(assembly);
+		}
 
 		public Database GetDatabase(Assembly assembly)
 		{
@@ -39,7 +47,7 @@ namespace SchemaSync.Postulate
 					{
 						Schema = GetTableSchema(t),
 						Name = GetTableName(t),
-						IdentityColumn = t.GetIdentityName(),
+						IdentityColumn = TryGetIdentityName(t),
 						Columns = GetColumns(t),
 						Indexes = GetIndexes(t),
 						ClusteredIndex = GetClusteredIndex(t)
@@ -47,6 +55,18 @@ namespace SchemaSync.Postulate
 				});
 
 			return source.ToDictionary(row => row.Type, row => row.Table);
+		}
+
+		private string TryGetIdentityName(Type t)
+		{
+			try
+			{
+				return t.GetIdentityName();
+			}
+			catch (Exception exc)
+			{
+				throw;
+			}			
 		}
 
 		private string GetClusteredIndex(Type t)
@@ -66,7 +86,7 @@ namespace SchemaSync.Postulate
 				{
 					Name = $"PK_{constraintName}",
 					Type = IndexType.PrimaryKey,
-					Columns = pkColumns.Select((pi, i) => new IndexColumn() { Name = GetColumnName(pi), Position = i })
+					Columns = pkColumns.Select((pi, i) => new IndexColumn() { Name = pi.GetColumnName(), Position = i })
 				};
 
 				yield return new Index()
@@ -97,11 +117,6 @@ namespace SchemaSync.Postulate
 			return t.GetProperties().Where(pi => !pi.HasAttribute<NotMappedAttribute>());
 		}
 
-		private string GetColumnName(PropertyInfo pi)
-		{
-			return (pi.HasAttribute(out ColumnAttribute attr, (a) => !string.IsNullOrEmpty(a.Name))) ? attr.Name : pi.Name;
-		}
-
 		private IEnumerable<Column> GetColumns(Type t)
 		{
 			return GetMappedColumns(t).Select(pi => ColumnFromProperty(pi));
@@ -109,11 +124,37 @@ namespace SchemaSync.Postulate
 
 		private Column ColumnFromProperty(PropertyInfo pi)
 		{
+			var scale = pi.GetAttribute<DecimalPrecisionAttribute>();
 			return new Column()
 			{
-				Name = GetColumnName(pi),
-				DataType = "whatever"
+				Name = pi.GetColumnName(),
+				DataType = _integrator.SupportedTypes(0, 0, 0)[pi.PropertyType].BaseName,
+				IsNullable = GetPropertyIsNullable(pi),
+				MaxLength = GetPropertyMaxLength(pi),
+				Scale = (scale?.Scale ?? 0),
+				Precision = (scale?.Precision ?? 0)				
 			};
+		}
+
+		private int GetPropertyMaxLength(PropertyInfo pi)
+		{
+			if (pi.HasAttribute(out MaxLengthAttribute attr))
+			{
+				return attr.Length;
+			}
+			return -1;
+		}
+
+		private bool GetPropertyIsNullable(PropertyInfo pi)
+		{
+			if (pi.HasAttribute<RequiredAttribute>())
+			{
+				return false;
+			}
+			else
+			{
+				return pi.PropertyType.IsNullable();
+			}				
 		}
 
 		private string GetIdentityColumn(Type t)

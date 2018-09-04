@@ -1,4 +1,5 @@
 ﻿using SchemaSync.Library;
+using SchemaSync.Postulate;
 using SchemaSync.SqlServer;
 using System;
 using System.Data.SqlClient;
@@ -11,18 +12,18 @@ namespace ConsoleApp
 	{
 		private static void Main(string[] args)
 		{
-			using (var cn = GetConnection())
-			{
-				var dbSource = new ConnectionProvider().GetDatabase(cn);
-				//var dbSource = new ConnectionProvider().GetDatabase(Assembly.LoadFile(@"C:\Users\Adam\Source\Repos\Hs5\Hs5.Models\bin\Debug\Hs5.Models.dll"));
-				//var dbDest = new ConnectionProvider(cn);				
-				//var diff = SchemaComparison.Execute(dbSource, dbDest);
-			}
+			var dbSqlServer = new SqlServerDbProvider().GetDatabase(ConnectionString);
+			var dbModel = new PostulateDbProvider().GetDatabase(@"C:\Users\Adam\Source\Repos\Hs5\Hs5.Models\bin\Debug\Hs5.Models.dll");
+		}
+
+		private static string ConnectionString
+		{
+			get { return @"Data Source=(localdb)\MSSqlLocalDb;Database=Hs5;Integrated Security=true"; }
 		}
 
 		private static SqlConnection GetConnection()
 		{
-			return new SqlConnection(@"Data Source=(localdb)\MSSqlLocalDb;Database=Hs5;Integrated Security=true");
+			return new SqlConnection(ConnectionString);
 		}
 	}
 }

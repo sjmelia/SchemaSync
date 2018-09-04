@@ -7,7 +7,7 @@ using System.Linq;
 
 namespace SchemaSync.SqlServer
 {
-	public partial class ConnectionProvider
+	public partial class SqlServerDbProvider
 	{
 		private IEnumerable<Table> GetTables(IDbConnection connection)
 		{

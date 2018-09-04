@@ -15,6 +15,7 @@ namespace SchemaSync.Postulate
 	public class PostulateDbProvider : IDbProviderFromAssembly
 	{		
 		private SqlServerIntegrator _integrator = new SqlServerIntegrator();
+		private List<IgnoredTypeInfo> _ignoredTypes = null;
 
 		public ObjectTypeFlags ObjectTypes => ObjectTypeFlags.Tables | ObjectTypeFlags.ForeignKeys;
 
@@ -39,8 +40,16 @@ namespace SchemaSync.Postulate
 
 		private Dictionary<Type, Table> GetTypeTableDictionary(Type[] types)
 		{
+			_ignoredTypes = new List<IgnoredTypeInfo>();
+
+			Func<Type, bool> isMapped = (t) => { return !t.HasAttribute<NotMappedAttribute>(); };
+			Func<Type, bool> hasIdentity = (t) => { return HasIdentityProperty(t); };
+
+			_ignoredTypes.AddRange(types.Where(t => !isMapped(t)).Select(t => new IgnoredTypeInfo() { Type = t, Reason = "Has a [NotMapped] attribute" }).ToList());
+			_ignoredTypes.AddRange(types.Where(t => !hasIdentity(t)).Select(t => new IgnoredTypeInfo() { Type = t, Reason = "No Id property nor [Identity] attribute found" }).ToList());
+
 			var source = types
-				.Where(t => !t.HasAttribute<NotMappedAttribute>())
+				.Where(t => isMapped(t) && hasIdentity(t))
 				.Select(t => new
 				{
 					Type = t,
@@ -48,26 +57,27 @@ namespace SchemaSync.Postulate
 					{
 						Schema = GetTableSchema(t),
 						Name = GetTableName(t),
-						IdentityColumn = TryGetIdentityName(t),
+						IdentityColumn = t.GetIdentityName(),
 						Columns = GetColumns(t),
 						Indexes = GetIndexes(t),
 						ClusteredIndex = GetClusteredIndex(t)
 					}
-				});
+				}).ToList();
 
 			return source.ToDictionary(row => row.Type, row => row.Table);
 		}
 
-		private string TryGetIdentityName(Type t)
+		private bool HasIdentityProperty(Type t)
 		{
 			try
 			{
-				return t.GetIdentityName();
+				string name = t.GetIdentityName();
+				return true;
 			}
-			catch (Exception exc)
+			catch 
 			{
-				throw;
-			}			
+				return false;
+			}
 		}
 
 		private string GetClusteredIndex(Type t)
@@ -80,7 +90,7 @@ namespace SchemaSync.Postulate
 			string constraintName = GetConstraintName(t);
 			string identityCol = t.GetIdentityName();
 
-			var pkColumns = GetMappedColumns(t).Where(pi => pi.HasAttribute<PrimaryKeyAttribute>());
+			var pkColumns = _integrator.GetMappedColumns(t).Where(pi => pi.HasAttribute<PrimaryKeyAttribute>());
 			if (pkColumns.Any())
 			{
 				yield return new Index()
@@ -113,14 +123,9 @@ namespace SchemaSync.Postulate
 			return GetTableSchema(t) + GetTableName(t);
 		}
 
-		private IEnumerable<PropertyInfo> GetMappedColumns(Type t)
-		{
-			return t.GetProperties().Where(pi => !pi.HasAttribute<NotMappedAttribute>());
-		}
-
 		private IEnumerable<Column> GetColumns(Type t)
 		{
-			return GetMappedColumns(t).Select(pi => ColumnFromProperty(pi));
+			return _integrator.GetMappedColumns(t).Select(pi => ColumnFromProperty(pi)).ToList();
 		}
 
 		private Column ColumnFromProperty(PropertyInfo pi)
@@ -157,20 +162,7 @@ namespace SchemaSync.Postulate
 				return pi.PropertyType.IsNullable();
 			}				
 		}
-
-		private string GetIdentityColumn(Type t)
-		{
-			const string defaultIdentity = "Id";
-			try
-			{
-				return (t.HasAttribute(out IdentityAttribute attr)) ? attr.PropertyName : t.GetProperty(defaultIdentity).Name;
-			}
-			catch (Exception exc)
-			{
-				throw new Exception($"Couldn't determine the Identity column of type {t.Name}, and property named '{defaultIdentity}' not found.", exc);
-			}
-		}
-
+		
 		private string GetTableName(Type t)
 		{
 			return (t.HasAttribute(out TableAttribute attr, (a) => !string.IsNullOrEmpty(a.Name))) ? attr.Name : t.Name;
@@ -186,7 +178,7 @@ namespace SchemaSync.Postulate
 			return typesAndTables.Select(kp => kp.Key)
 				.SelectMany(t => t.GetProperties()
 					.Where(pi => pi.HasAttribute<ReferencesAttribute>()))
-					.Select(pi => ForeignKeyFromProperty(typesAndTables, pi));
+					.Select(pi => ForeignKeyFromProperty(typesAndTables, pi)).ToList();
 		}
 
 		private ForeignKey ForeignKeyFromProperty(Dictionary<Type, Table> typesAndTables, PropertyInfo pi)

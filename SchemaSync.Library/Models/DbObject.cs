@@ -51,7 +51,9 @@ namespace SchemaSync.Library.Models
 
 		public IEnumerable<string> Rebuild(Database database, SqlSyntax syntax)
 		{
-			foreach (var @object in GetDependencies(database))
+			var dependencies = GetDependencies(database);
+
+			foreach (var @object in dependencies)
 			{
 				foreach (var cmd in @object.DropCommands(syntax)) yield return cmd;
 			}
@@ -60,7 +62,7 @@ namespace SchemaSync.Library.Models
 
 			foreach (var cmd in CreateCommands(syntax)) yield return cmd;
 
-			foreach (var @object in GetDependencies(database))
+			foreach (var @object in dependencies)
 			{
 				foreach (var cmd in @object.CreateCommands(syntax)) yield return cmd;
 			}

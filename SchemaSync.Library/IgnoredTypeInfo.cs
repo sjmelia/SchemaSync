@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace SchemaSync.Postulate
+namespace SchemaSync.Library
 {
 	public class IgnoredTypeInfo
 	{

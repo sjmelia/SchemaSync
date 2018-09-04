@@ -40,6 +40,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="IgnoredTypeInfo.cs" />
     <Compile Include="Interfaces\IDbProviderFromAssembly.cs" />
     <Compile Include="Interfaces\IDbProviderFromConnection.cs" />
     <Compile Include="Models\DbObject.cs" />

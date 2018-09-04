@@ -26,6 +26,7 @@ namespace SchemaSync.Postulate
 
 		public Database GetDatabase(Assembly assembly)
 		{
+			// problem here is that it's getting all types, including those we don't intend as model classes (e.g. seed data)
 			var types = assembly.GetExportedTypes();
 
 			var typeTableMap = GetTypeTableDictionary(types);

@@ -78,7 +78,7 @@ namespace SchemaSync.Postulate
 			try
 			{
 				var pi = t.GetIdentityProperty();
-				return true;
+				return (pi != null);
 			}
 			catch 
 			{
@@ -140,7 +140,7 @@ namespace SchemaSync.Postulate
 			return new Column()
 			{
 				Name = pi.GetColumnName(),
-				DataType = _integrator.SupportedTypes(0, 0, 0)[pi.PropertyType].BaseName,
+				DataType = _integrator.FindTypeInfo(pi.PropertyType).BaseName,
 				IsNullable = GetPropertyIsNullable(pi),
 				MaxLength = GetPropertyMaxLength(pi),
 				Scale = (scale?.Scale ?? 0),
@@ -181,10 +181,11 @@ namespace SchemaSync.Postulate
 
 		private IEnumerable<ForeignKey> GetForeignKeys(Dictionary<Type, Table> typesAndTables)
 		{
-			return typesAndTables.Select(kp => kp.Key)
+			var fkProps = typesAndTables.Select(kp => kp.Key)
 				.SelectMany(t => t.GetProperties()
-					.Where(pi => pi.HasAttribute<ReferencesAttribute>()))
-					.Select(pi => ForeignKeyFromProperty(typesAndTables, pi)).ToList();
+					.Where(pi => pi.HasAttribute<ReferencesAttribute>()));
+
+			return fkProps.Select(pi => ForeignKeyFromProperty(typesAndTables, pi)).ToList();
 		}
 
 		private ForeignKey ForeignKeyFromProperty(Dictionary<Type, Table> typesAndTables, PropertyInfo pi)

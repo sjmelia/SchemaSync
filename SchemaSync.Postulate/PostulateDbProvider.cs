@@ -26,6 +26,11 @@ namespace SchemaSync.Postulate
 			return GetDatabase(assembly);
 		}
 
+		public IEnumerable<IgnoredTypeInfo> IgnoredTypes
+		{
+			get { return _ignoredTypes; }
+		}
+
 		public Database GetDatabase(Assembly assembly)
 		{
 			// problem here is that it's getting all types, including those we don't intend as model classes (e.g. seed data)
@@ -72,7 +77,7 @@ namespace SchemaSync.Postulate
 		{
 			try
 			{
-				string name = t.GetIdentityName();
+				var pi = t.GetIdentityProperty();
 				return true;
 			}
 			catch 

@@ -14,6 +14,7 @@ namespace SchemaSync.SqlServer
 		public override string DefaultSchema => "dbo";
 		public override string IdentitySyntax => "identity(1,1)";
 		public override bool SupportsSchemas => true;
+		public override string CommentStart => "--";
 
 		public override string GetDataTypeDefinition(Column column)
 		{

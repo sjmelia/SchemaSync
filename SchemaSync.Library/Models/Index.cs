@@ -22,7 +22,7 @@ namespace SchemaSync.Library.Models
 		public Table Table { get; set; }
 		public string Name { get; set; }
 		public IndexType Type { get; set; }
-		public bool IsClustered { get; set; }
+		public bool IsClustered { get { return Name.Equals(Table.ClusteredIndex); } }
 		public IEnumerable<IndexColumn> Columns { get; set; }
 
 		public override IEnumerable<string> CreateCommands(SqlSyntax syntax)

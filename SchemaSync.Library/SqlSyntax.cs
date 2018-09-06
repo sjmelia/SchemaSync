@@ -37,6 +37,11 @@ namespace SchemaSync.Library
 		public abstract string GetDataTypeDefinition(Column column);
 
 		/// <summary>
+		/// String that indicates a comment
+		/// </summary>
+		public abstract string CommentStart { get; }
+
+		/// <summary>
 		/// For example GO in T-SQL
 		/// </summary>
 		public abstract string BatchSeparator { get; }

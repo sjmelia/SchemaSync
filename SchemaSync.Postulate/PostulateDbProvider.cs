@@ -34,7 +34,7 @@ namespace SchemaSync.Postulate
 		}
 
 		public Database GetDatabase(Assembly assembly)
-		{			
+		{
 			var types = assembly.GetExportedTypes();
 			var typeTableMap = GetTypeTableDictionary(types);
 
@@ -69,7 +69,7 @@ namespace SchemaSync.Postulate
 						Name = GetTableName(t),
 						IdentityColumn = t.GetIdentityName(),
 						Columns = GetColumns(t),
-						Indexes = GetIndexes(t),
+						Indexes = GetIndexes(t).ToList(),
 						ClusteredIndex = GetClusteredIndex(t)
 					}
 				}).ToList();

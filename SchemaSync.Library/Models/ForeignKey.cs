@@ -46,7 +46,7 @@ namespace SchemaSync.Library.Models
 
 		public override IEnumerable<string> DropCommands(SqlSyntax syntax)
 		{
-			yield return $"ALTER TABLE <{ReferencedTable}> DROP CONSTRAINT <{Name}>";
+			yield return $"ALTER TABLE <{ReferencingTable}> DROP CONSTRAINT <{Name}>";
 		}
 
 		public override bool IsAltered(object compare)

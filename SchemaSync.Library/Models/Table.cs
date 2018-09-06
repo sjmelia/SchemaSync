@@ -19,11 +19,6 @@ namespace SchemaSync.Library.Models
 		public IEnumerable<Column> Columns { get; set; } = Enumerable.Empty<Column>();
 		public IEnumerable<Index> Indexes { get; set; } = Enumerable.Empty<Index>();
 
-		public override IEnumerable<string> AlterCommands(SqlSyntax syntax)
-		{
-			throw new System.NotImplementedException();
-		}
-
 		public override IEnumerable<string> CreateCommands(SqlSyntax syntax)
 		{
 			string columns = string.Join(",\r\n", Columns.OrderBy(col => col.InternalId).Select(col => $"\t{col.Definition(syntax)}"));

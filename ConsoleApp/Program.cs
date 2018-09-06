@@ -21,7 +21,17 @@ namespace ConsoleApp
 			foreach (var grp in diff.Create.GroupBy(row => row.GetType().Name))
 			{
 				Console.WriteLine(grp.Key);
-				foreach (var item in grp) Console.WriteLine($"- {item}");
+				foreach (var item in grp)
+				{
+					Console.WriteLine($"- {item}");
+				}
+			}			
+
+			foreach (var cmd in diff.GetScriptCommands(new SqlServerSyntax()))
+			{
+				Console.WriteLine(cmd);
+				Console.WriteLine("GO");
+				Console.WriteLine();
 			}
 
 			Console.ReadLine();

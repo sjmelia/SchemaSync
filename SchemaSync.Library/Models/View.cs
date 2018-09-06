@@ -22,7 +22,7 @@ namespace SchemaSync.Library.Models
 			throw new System.NotImplementedException();
 		}
 
-		public override bool IsAltered(object compare)
+		public override bool IsAltered(DbObject compare)
 		{
 			throw new System.NotImplementedException();
 		}

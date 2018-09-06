@@ -4,8 +4,8 @@ using System.Reflection;
 
 namespace SchemaSync.Library.Interfaces
 {
-	public interface IDbProviderFromAssembly
-	{
+	public interface IDbAssemblyProvider
+	{		
 		ObjectTypeFlags ObjectTypes { get; }
 		Database GetDatabase(Assembly assembly);
 		IEnumerable<IgnoredTypeInfo> IgnoredTypes { get; }

@@ -20,7 +20,7 @@ namespace SchemaSync.Library.Models
 			yield return $"DROP PROCEDURE <{Name}>";
 		}
 
-		public override bool IsAltered(object compare)
+		public override bool IsAltered(DbObject compare)
 		{
 			throw new System.NotImplementedException();
 		}

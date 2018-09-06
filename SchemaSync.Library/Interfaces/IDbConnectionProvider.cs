@@ -3,7 +3,7 @@ using System.Data;
 
 namespace SchemaSync.Library.Interfaces
 {
-	public interface IDbProviderFromConnection
+	public interface IDbConnectionProvider
 	{
 		ObjectTypeFlags ObjectTypes { get; }
 

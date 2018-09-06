@@ -5,7 +5,7 @@ using System.Data.SqlClient;
 
 namespace SchemaSync.SqlServer
 {
-	public partial class SqlServerDbProvider : IDbProviderFromConnection
+	public partial class SqlServerDbProvider : IDbConnectionProvider
 	{
 		public ObjectTypeFlags ObjectTypes => ObjectTypeFlags.Tables | ObjectTypeFlags.ForeignKeys;
 

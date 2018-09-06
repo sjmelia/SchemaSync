@@ -68,6 +68,11 @@ namespace SchemaSync.Library.Models
 			return false;
 		}
 
+		public override string ToString()
+		{
+			return Name;
+		}
+
 		public override int GetHashCode()
 		{
 			return Name.GetHashCode();

@@ -2,7 +2,7 @@
 using System.Linq;
 
 namespace SchemaSync.Library.Models
-{
+{	
 	public abstract class DbObject
 	{
 		/// <summary>

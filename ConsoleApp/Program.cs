@@ -4,6 +4,7 @@ using SchemaSync.SqlServer;
 using System;
 using System.Data.SqlClient;
 using System.IO;
+using System.Linq;
 using System.Reflection;
 
 namespace ConsoleApp
@@ -14,6 +15,16 @@ namespace ConsoleApp
 		{
 			var dbSqlServer = new SqlServerDbProvider().GetDatabase(ConnectionString);
 			var dbModel = new PostulateDbProvider().GetDatabase(@"C:\Users\Adam\Source\Repos\Hs5\Hs5.Models\bin\Debug\Hs5.Models.dll");
+			var diff = SchemaComparison.Execute(dbModel, dbSqlServer);
+
+			Console.WriteLine("Create:");
+			foreach (var grp in diff.Create.GroupBy(row => row.GetType().Name))
+			{
+				Console.WriteLine(grp.Key);
+				foreach (var item in grp) Console.WriteLine($"- {item}");
+			}
+
+			Console.ReadLine();
 		}
 
 		private static string ConnectionString

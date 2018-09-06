@@ -31,7 +31,7 @@ namespace SchemaSync.Library.Models
 
 		public override string ToString()
 		{
-			return Name;
+			return $"{Table}.{Name}";
 		}
 
 		public override bool Equals(object obj)

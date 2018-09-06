@@ -18,7 +18,7 @@ namespace SchemaSync.Postulate
 		private SqlServerIntegrator _integrator = new SqlServerIntegrator();
 		private List<IgnoredTypeInfo> _ignoredTypes = null;
 
-		public ObjectTypeFlags ObjectTypes => ObjectTypeFlags.Tables | ObjectTypeFlags.ForeignKeys;
+		public ObjectTypeFlags ObjectTypes => ObjectTypeFlags.Tables | ObjectTypeFlags.ForeignKeys;		
 
 		public Database GetDatabase(string path)
 		{
@@ -26,16 +26,16 @@ namespace SchemaSync.Postulate
 			return GetDatabase(assembly);
 		}
 
+		public string DefaultSchema { get; set; } = "dbo";
+
 		public IEnumerable<IgnoredTypeInfo> IgnoredTypes
 		{
 			get { return _ignoredTypes; }
 		}
 
 		public Database GetDatabase(Assembly assembly)
-		{
-			// problem here is that it's getting all types, including those we don't intend as model classes (e.g. seed data)
+		{			
 			var types = assembly.GetExportedTypes();
-
 			var typeTableMap = GetTypeTableDictionary(types);
 
 			var db = new Database();
@@ -50,12 +50,14 @@ namespace SchemaSync.Postulate
 
 			Func<Type, bool> isMapped = (t) => { return !t.HasAttribute<NotMappedAttribute>(); };
 			Func<Type, bool> hasIdentity = (t) => { return HasIdentityProperty(t); };
+			Func<Type, bool> isAbstract = (t) => { return t.IsAbstract; };
 
 			_ignoredTypes.AddRange(types.Where(t => !isMapped(t)).Select(t => new IgnoredTypeInfo() { Type = t, Reason = "Has a [NotMapped] attribute" }).ToList());
 			_ignoredTypes.AddRange(types.Where(t => !hasIdentity(t)).Select(t => new IgnoredTypeInfo() { Type = t, Reason = "No Id property nor [Identity] attribute found" }).ToList());
+			_ignoredTypes.AddRange(types.Where(t => isAbstract(t)).Select(t => new IgnoredTypeInfo() { Type = t, Reason = "Type is abstract" }).ToList());
 
 			var source = types
-				.Where(t => isMapped(t) && hasIdentity(t))
+				.Where(t => !_ignoredTypes.Any(it => it.Type.Equals(t)))
 				.Select(t => new
 				{
 					Type = t,
@@ -69,6 +71,12 @@ namespace SchemaSync.Postulate
 						ClusteredIndex = GetClusteredIndex(t)
 					}
 				}).ToList();
+
+			foreach (var item in source)
+			{
+				foreach (var col in item.Table.Columns) col.Table = item.Table;
+				foreach (var ndx in item.Table.Indexes) ndx.Table = item.Table;
+			}
 
 			return source.ToDictionary(row => row.Type, row => row.Table);
 		}
@@ -176,7 +184,9 @@ namespace SchemaSync.Postulate
 
 		private string GetTableSchema(Type t)
 		{
-			return (t.HasAttribute(out TableAttribute attr, (a) => !string.IsNullOrEmpty(a.Schema))) ? attr.Schema : string.Empty;
+			if (t.HasAttribute(out SchemaAttribute schemaAttr)) return schemaAttr.Name;
+			if (t.HasAttribute(out TableAttribute tableAttr, (a) => !string.IsNullOrEmpty(a.Schema))) return tableAttr.Schema;
+			return DefaultSchema;
 		}
 
 		private IEnumerable<ForeignKey> GetForeignKeys(Dictionary<Type, Table> typesAndTables)

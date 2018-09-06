@@ -91,7 +91,8 @@ namespace SchemaSync.Library
 			var droppedColumns = matchingTables.SelectMany(t => t.Columns).Where(c => !source.Tables.SelectMany(t => t.Columns).Contains(c));
 			results.AddRange(droppedColumns);
 
-			// dropped FKs
+			var droppedIndexes = matchingTables.SelectMany(t => t.Indexes).Where(x => !source.Tables.SelectMany(t => t.Indexes).Contains(x));
+			results.AddRange(droppedIndexes);
 
 			return results;
 		}

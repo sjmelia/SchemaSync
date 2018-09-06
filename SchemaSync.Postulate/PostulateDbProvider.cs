@@ -13,7 +13,7 @@ using System.Reflection;
 
 namespace SchemaSync.Postulate
 {
-	public class PostulateDbProvider : IDbProviderFromAssembly
+	public partial class PostulateDbProvider : IDbProviderFromAssembly
 	{		
 		private SqlServerIntegrator _integrator = new SqlServerIntegrator();
 		private List<IgnoredTypeInfo> _ignoredTypes = null;
@@ -48,13 +48,15 @@ namespace SchemaSync.Postulate
 		{
 			_ignoredTypes = new List<IgnoredTypeInfo>();
 
-			Func<Type, bool> isMapped = (t) => { return !t.HasAttribute<NotMappedAttribute>(); };
-			Func<Type, bool> hasIdentity = (t) => { return HasIdentityProperty(t); };
-			Func<Type, bool> isAbstract = (t) => { return t.IsAbstract; };
+			var rules = GetTypeExcludeRules();
 
-			_ignoredTypes.AddRange(types.Where(t => !isMapped(t)).Select(t => new IgnoredTypeInfo() { Type = t, Reason = "Has a [NotMapped] attribute" }).ToList());
-			_ignoredTypes.AddRange(types.Where(t => !hasIdentity(t)).Select(t => new IgnoredTypeInfo() { Type = t, Reason = "No Id property nor [Identity] attribute found" }).ToList());
-			_ignoredTypes.AddRange(types.Where(t => isAbstract(t)).Select(t => new IgnoredTypeInfo() { Type = t, Reason = "Type is abstract" }).ToList());
+			foreach (var rule in rules)
+			{
+				_ignoredTypes.AddRange(
+					types.Where(t => rule.Rule.Invoke(t))
+					.Select(t => new IgnoredTypeInfo() { Type = t, Reason = rule.Description })
+				);
+			}
 
 			var source = types
 				.Where(t => !_ignoredTypes.Any(it => it.Type.Equals(t)))
@@ -134,7 +136,9 @@ namespace SchemaSync.Postulate
 
 		private string GetConstraintName(Type t)
 		{
-			return GetTableSchema(t) + GetTableName(t);
+			string schema = GetTableSchema(t);
+			if (schema.Equals(DefaultSchema)) schema = string.Empty;
+			return schema + GetTableName(t);
 		}
 
 		private IEnumerable<Column> GetColumns(Type t)
@@ -209,6 +213,6 @@ namespace SchemaSync.Postulate
 				ReferencingTable = typesAndTables[pi.DeclaringType],
 				Columns = new ForeignKey.Column[] { new ForeignKey.Column() { ReferencingName = pi.GetColumnName(), ReferencedName = pi.DeclaringType.GetIdentityName() } }
 			};
-		}
+		}		
 	}
 }

@@ -66,7 +66,8 @@ namespace SchemaSync.Library.Models
 				if (test.MaxLength != MaxLength) return true;
 				if (test.IsNullable != IsNullable) return true;
 				if (test.Scale != Scale) return true;
-				if (test.Precision != Precision) return true;				
+				if (test.Precision != Precision) return true;
+				if (!test.Collation.Equals(Collation)) return true;
 				// not sure how to handle defaults as they don't really impact the column def
 			}
 

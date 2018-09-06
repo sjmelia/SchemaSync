@@ -24,8 +24,8 @@ namespace SchemaSync.Library
 		public void Execute()
 		{
 			Create = CompareCreateObjects(Source, Destination);
-			Alter = Enumerable.Empty<DbObject>();
-			Drop = Enumerable.Empty<DbObject>();
+			Alter = CompareAlterObjects(Source, Destination);
+			Drop = CompareDropObjects(Source, Destination);
 		}
 
 		public Database Source { get; private set; }
@@ -68,12 +68,32 @@ namespace SchemaSync.Library
 								  select s;
 			results.AddRange(alteredColumns);
 
+			var alteredKFs = from s in source.ForeignKeys
+							 join d in destination.ForeignKeys on s equals d
+							 where s.IsAltered(d)
+							 select s;
+			results.AddRange(alteredKFs);
+
 			return results;
 		}
 
-		private IEnumerable<DbObject> CompareDropObjects(Database database)
+		private IEnumerable<DbObject> CompareDropObjects(Database source, Database destination)
 		{
-			throw new NotImplementedException();
+			List<DbObject> results = new List<DbObject>();
+
+			var droppedTables = destination.Tables.Where(t => !source.Tables.Contains(t));
+			results.AddRange(droppedTables);
+
+			var matchingTables = from s in source.Tables
+								join d in source.Tables on s equals d
+								select d;
+
+			var droppedColumns = matchingTables.SelectMany(t => t.Columns).Where(c => !source.Tables.SelectMany(t => t.Columns).Contains(c));
+			results.AddRange(droppedColumns);
+
+			// dropped FKs
+
+			return results;
 		}
 
 		public IEnumerable<string> GetScriptCommands(SqlSyntax syntax)

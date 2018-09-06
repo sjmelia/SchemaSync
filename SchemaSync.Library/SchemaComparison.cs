@@ -94,6 +94,9 @@ namespace SchemaSync.Library
 			var droppedIndexes = matchingTables.SelectMany(t => t.Indexes).Where(x => !source.Tables.SelectMany(t => t.Indexes).Contains(x));
 			results.AddRange(droppedIndexes);
 
+			var droppedFKs = destination.ForeignKeys.Where(fk => !source.ForeignKeys.Contains(fk));
+			results.AddRange(droppedFKs);
+
 			return results;
 		}
 

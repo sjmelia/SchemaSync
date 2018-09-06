@@ -19,7 +19,7 @@ namespace SchemaSync.Library.Models
 		/// <summary>
 		/// Returns true if an object was modified and needs to be altered or rebuilt
 		/// </summary>
-		public abstract bool IsAltered(object compare);
+		public abstract bool IsAltered(DbObject compare);
 
 		/// <summary>
 		/// Generates the SQL CREATE statement(s) for an object

@@ -55,7 +55,7 @@ namespace SchemaSync.Library.Models
 			return (!string.IsNullOrEmpty(Schema)) ? $"{Schema}.{Name}" : Name;
 		}
 
-		public override bool IsAltered(object compare)
+		public override bool IsAltered(DbObject compare)
 		{
 			throw new System.NotImplementedException();
 		}

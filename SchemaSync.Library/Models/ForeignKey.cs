@@ -49,9 +49,16 @@ namespace SchemaSync.Library.Models
 			yield return $"ALTER TABLE <{ReferencingTable}> DROP CONSTRAINT <{Name}>";
 		}
 
-		public override bool IsAltered(object compare)
+		public override bool IsAltered(DbObject compare)
 		{
-			throw new System.NotImplementedException();
+			ForeignKey test = compare as ForeignKey;
+			if (test != null)
+			{
+				if (test.CascadeDelete != CascadeDelete) return true;
+				if (test.CascadeUpdate != CascadeUpdate) return true;
+			}
+
+			return false;
 		}
 
 		public override bool Equals(object obj)

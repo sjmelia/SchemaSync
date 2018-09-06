@@ -52,7 +52,7 @@ namespace SchemaSync.Library.Models
 			yield return $"DROP INDEX <{Name}> ON <{Table}>";
 		}
 
-		public override bool IsAltered(object compare)
+		public override bool IsAltered(DbObject compare)
 		{
 			throw new System.NotImplementedException();
 		}

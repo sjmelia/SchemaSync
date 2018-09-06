@@ -57,9 +57,20 @@ namespace SchemaSync.Library.Models
 			return Table.GetHashCode() + (Name ?? string.Empty).ToLower().GetHashCode();
 		}
 
-		public override bool IsAltered(object compare)
+		public override bool IsAltered(DbObject compare)
 		{
-			throw new System.NotImplementedException();
+			Column test = compare as Column;
+			if (test != null)
+			{
+				if (!test.DataType.Equals(DataType)) return true;
+				if (test.MaxLength != MaxLength) return true;
+				if (test.IsNullable != IsNullable) return true;
+				if (test.Scale != Scale) return true;
+				if (test.Precision != Precision) return true;				
+				// not sure how to handle defaults as they don't really impact the column def
+			}
+
+			return false;
 		}
 	}
 }

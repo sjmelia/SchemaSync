@@ -52,14 +52,23 @@ namespace SchemaSync.Library
 			var newForeignKeys = source.ForeignKeys.Where(fk => !destination.ForeignKeys.Contains(fk));
 			results.AddRange(newForeignKeys);
 
-			// indexes
+			var newIndexes = matchingTables.SelectMany(t => t.Indexes).Where(x => !destination.Tables.SelectMany(t => t.Indexes).Contains(x));
+			results.AddRange(newIndexes);
 
 			return results;
 		}
 
-		private IEnumerable<DbObject> CompareAlterObjects(Database database)
+		private static IEnumerable<DbObject> CompareAlterObjects(Database source, Database destination)
 		{
-			throw new NotImplementedException();
+			List<DbObject> results = new List<DbObject>();
+
+			var alteredColumns = from s in source.Tables.SelectMany(t => t.Columns)
+								  join d in destination.Tables.SelectMany(t => t.Columns) on s equals d
+								  where s.IsAltered(d)
+								  select s;
+			results.AddRange(alteredColumns);
+
+			return results;
 		}
 
 		private IEnumerable<DbObject> CompareDropObjects(Database database)

@@ -1,5 +1,6 @@
 ﻿using SchemaSync.Library.Interfaces;
 using SchemaSync.Library.Models;
+using System;
 using System.Data;
 using System.Data.SqlClient;
 
@@ -9,10 +10,7 @@ namespace SchemaSync.SqlServer
 	{
 		public ObjectTypeFlags ObjectTypes => ObjectTypeFlags.Tables | ObjectTypeFlags.ForeignKeys;
 
-		public IDbConnection GetConnection(string connectionString)
-		{
-			return new SqlConnection(connectionString);
-		}
+		public Func<string, IDbConnection> ConnectionMethod => (connectionString) => new SqlConnection(connectionString);
 
 		public Database GetDatabase(string connectionString)
 		{

@@ -1,4 +1,5 @@
 ﻿using SchemaSync.Library.Models;
+using System;
 using System.Data;
 
 namespace SchemaSync.Library.Interfaces
@@ -9,6 +10,6 @@ namespace SchemaSync.Library.Interfaces
 
 		Database GetDatabase(IDbConnection connection);
 
-		IDbConnection GetConnection(string connectionString);
+		Func<string, IDbConnection> ConnectionMethod { get;  }		
 	}
 }

@@ -41,8 +41,8 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="IgnoredTypeInfo.cs" />
-    <Compile Include="Interfaces\IDbProviderFromAssembly.cs" />
-    <Compile Include="Interfaces\IDbProviderFromConnection.cs" />
+    <Compile Include="Interfaces\IDbAssemblyProvider.cs" />
+    <Compile Include="Interfaces\IDbConnectionProvider.cs" />
     <Compile Include="Models\DbObject.cs" />
     <Compile Include="Models\Parameter.cs" />
     <Compile Include="Models\Column.cs" />

@@ -9,6 +9,11 @@ namespace SchemaSync.SqlServer
 	{
 		public ObjectTypeFlags ObjectTypes => ObjectTypeFlags.Tables | ObjectTypeFlags.ForeignKeys;
 
+		public IDbConnection GetConnection(string connectionString)
+		{
+			return new SqlConnection(connectionString);
+		}
+
 		public Database GetDatabase(string connectionString)
 		{
 			using (var cn = new SqlConnection(connectionString))

@@ -8,5 +8,7 @@ namespace SchemaSync.Library.Interfaces
 		ObjectTypeFlags ObjectTypes { get; }
 
 		Database GetDatabase(IDbConnection connection);
+
+		IDbConnection GetConnection(string connectionString);
 	}
 }

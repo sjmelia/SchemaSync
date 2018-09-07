@@ -13,7 +13,7 @@ using System.Reflection;
 
 namespace SchemaSync.Postulate
 {
-	public partial class PostulateDbProvider : IDbProviderFromAssembly
+	public partial class PostulateDbProvider : IDbAssemblyProvider
 	{		
 		private SqlServerIntegrator _integrator = new SqlServerIntegrator();
 		private List<IgnoredTypeInfo> _ignoredTypes = null;

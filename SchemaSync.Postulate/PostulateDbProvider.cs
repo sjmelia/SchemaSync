@@ -157,8 +157,18 @@ namespace SchemaSync.Postulate
 				IsNullable = GetPropertyIsNullable(pi),
 				MaxLength = GetPropertyMaxLength(pi),
 				Scale = (scale?.Scale ?? 0),
-				Precision = (scale?.Precision ?? 0)				
+				Precision = (scale?.Precision ?? 0),
+				Expression = GetCalculationExpression(pi)
 			};
+		}
+
+		private string GetCalculationExpression(PropertyInfo pi)
+		{
+			if (pi.HasAttribute(out CalculatedAttribute attr))
+			{
+				return "(" + attr.Expression + ")";
+			}
+			return null;
 		}
 
 		private string GetDataType(PropertyInfo pi, ref DecimalPrecisionAttribute decimalAttr)
@@ -186,7 +196,7 @@ namespace SchemaSync.Postulate
 		private int GetPropertyMaxLength(PropertyInfo pi)
 		{
 			if (pi.HasAttribute(out MaxLengthAttribute attr)) return attr.Length;
-			return 0;
+			return -1;
 		}
 
 		private bool GetPropertyIsNullable(PropertyInfo pi)

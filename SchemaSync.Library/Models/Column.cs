@@ -12,7 +12,8 @@ namespace SchemaSync.Library.Models
 		public string Collation { get; set; }
 		public int MaxLength { get; set; }
 		public int Scale { get; set; }
-		public int Precision { get; set; }		
+		public int Precision { get; set; }
+		public string Expression { get; set; }
 
 		public override IEnumerable<string> AlterCommands(SqlSyntax syntax)
 		{
@@ -47,9 +48,19 @@ namespace SchemaSync.Library.Models
 
 		internal string Definition(SqlSyntax syntax)
 		{
-			string identity = (Table.IdentityColumn?.Equals(Name) ?? false) ? $" {syntax.IdentitySyntax}" : string.Empty;
-			string result = $"<{Name}> {syntax.GetDataTypeDefinition(this)}{identity} {((IsNullable) ? "NULL" : "NOT NULL")}";
-			if (!string.IsNullOrEmpty(Default)) result += $" DEFAULT ({Default})";
+			string result = null;
+
+			if (!string.IsNullOrEmpty(Expression))
+			{
+				result = $"<{Name}> AS {Expression}";
+			}
+			else
+			{
+				string identity = (Table.IdentityColumn?.Equals(Name) ?? false) ? $" {syntax.IdentitySyntax}" : string.Empty;
+				result = $"<{Name}> {syntax.GetDataTypeDefinition(this)}{identity} {((IsNullable) ? "NULL" : "NOT NULL")}";
+				if (!string.IsNullOrEmpty(Default)) result += $" DEFAULT ({Default})";
+			}
+			
 			return result;
 		}
 
@@ -63,7 +74,13 @@ namespace SchemaSync.Library.Models
 			Column test = compare as Column;
 			if (test != null)
 			{
-				if (DataType.Equals("decimal"))
+				if (!(test?.Expression ?? string.Empty).Equals(Expression ?? string.Empty))
+				{
+					AlterDescription = $"Calculation expression changed from {test.Expression} to {Expression}";
+					return true;
+				}
+
+				if (DataType.Equals("decimal") && string.IsNullOrEmpty(Expression))
 				{
 					if (test.Scale != Scale)
 					{
@@ -93,19 +110,16 @@ namespace SchemaSync.Library.Models
 					}
 				}
 
-				if (test.IsNullable != IsNullable)
+				if (test.IsNullable != IsNullable && string.IsNullOrEmpty(Expression))
 				{
 					AlterDescription = $"Nullable changed from {test.IsNullable} to {IsNullable}";
 					return true;
 				}
 
-				if (!string.IsNullOrEmpty(test.Collation) && !string.IsNullOrEmpty(Collation))
+				if (!(test?.Collation ?? string.Empty).Equals(Collation ?? test?.Collation ?? string.Empty))
 				{
-					if (!test.Collation.Equals(Collation))
-					{
-						AlterDescription = $"Collation changed from {test.Collation} to {Collation}";
-						return true;
-					}
+					AlterDescription = $"Collation changed from {test.Collation} to {Collation}";
+					return true;
 				}
 				
 				// not sure how to handle defaults as they don't really impact the column def

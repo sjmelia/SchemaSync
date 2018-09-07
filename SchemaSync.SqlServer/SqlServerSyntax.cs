@@ -20,11 +20,9 @@ namespace SchemaSync.SqlServer
 		{
 			string result = column.DataType;
 
-			int lengthDivisor = (result.StartsWith("nvar")) ? 2 : 1;
-
 			if (result.StartsWith("nvar") || result.StartsWith("var"))
 			{
-				result += (column.MaxLength > -1) ? $"({column.MaxLength / lengthDivisor})" : "(max)";
+				result += (column.MaxLength > -1) ? $"({column.MaxLength})" : "(max)";
 			}
 
 			if (result.Equals("decimal"))

@@ -54,10 +54,19 @@ namespace SchemaSync.Library.Models
 			ForeignKey test = compare as ForeignKey;
 			if (test != null)
 			{
-				if (test.CascadeDelete != CascadeDelete) return true;
-				if (test.CascadeUpdate != CascadeUpdate) return true;
-			}
+				if (test.CascadeDelete != CascadeDelete)
+				{
+					AlterDescription = $"Cascade Update changed from {test.CascadeDelete} to {CascadeDelete}";
+					return true;
+				}
 
+				if (test.CascadeUpdate != CascadeUpdate)
+				{
+					AlterDescription = $"Cascade Delete changed from {test.CascadeUpdate} to {CascadeUpdate}";
+					return true;
+				}
+			}
+			
 			return false;
 		}
 

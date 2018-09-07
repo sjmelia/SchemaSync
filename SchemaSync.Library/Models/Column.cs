@@ -16,6 +16,7 @@ namespace SchemaSync.Library.Models
 
 		public override IEnumerable<string> AlterCommands(SqlSyntax syntax)
 		{
+			if (!string.IsNullOrEmpty(AlterDescription)) yield return $"{syntax.CommentStart} {AlterDescription}";
 			yield return $"ALTER TABLE <{Table}> ALTER COLUMN {Definition(syntax)}";
 		}
 
@@ -62,20 +63,54 @@ namespace SchemaSync.Library.Models
 			Column test = compare as Column;
 			if (test != null)
 			{
-				if (!test.DataType.Equals(DataType)) return true;
-				if (test.MaxLength != MaxLength) return true;
-				if (test.IsNullable != IsNullable) return true;
-				if (test.Scale != Scale) return true;
-				if (test.Precision != Precision) return true;
+				if (DataType.Equals("decimal"))
+				{
+					if (test.Scale != Scale)
+					{
+						AlterDescription = $"Scale changed from {test.Scale} to {Scale}";
+						return true;
+					}
+
+					if (test.Precision != Precision)
+					{
+						AlterDescription = $"Precision changed from {test.Precision} to {Precision}";
+						return true;
+					}
+				}
+
+				if (!test.DataType.Equals(DataType))
+				{
+					AlterDescription = $"Data type changed from {test.DataType} to {DataType}";
+					return true;
+				}
+
+				if (DataType.StartsWith("var") || DataType.StartsWith("nvar"))
+				{
+					if (test.MaxLength != MaxLength)
+					{
+						AlterDescription = $"Max length changed from {test.MaxLength} to {MaxLength}";
+						return true;
+					}
+				}
+
+				if (test.IsNullable != IsNullable)
+				{
+					AlterDescription = $"Nullable changed from {test.IsNullable} to {IsNullable}";
+					return true;
+				}
 
 				if (!string.IsNullOrEmpty(test.Collation) && !string.IsNullOrEmpty(Collation))
 				{
-					if (!test.Collation.Equals(Collation)) return true;
+					if (!test.Collation.Equals(Collation))
+					{
+						AlterDescription = $"Collation changed from {test.Collation} to {Collation}";
+						return true;
+					}
 				}
 				
 				// not sure how to handle defaults as they don't really impact the column def
 			}
-
+			
 			return false;
 		}
 	}

@@ -1,4 +1,5 @@
-﻿using SchemaSync.Library.Interfaces;
+﻿using SchemaSync.Library;
+using SchemaSync.Library.Interfaces;
 using SchemaSync.Library.Models;
 using System;
 using System.Data;
@@ -26,6 +27,11 @@ namespace SchemaSync.SqlServer
 			db.Tables = GetTables(connection);
 			db.ForeignKeys = GetForeignKeys(connection);
 			return db;
+		}
+
+		public SqlSyntax GetDefaultSyntax()
+		{
+			return new SqlServerSyntax();
 		}
 	}
 }

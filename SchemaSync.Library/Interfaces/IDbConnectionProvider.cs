@@ -10,6 +10,8 @@ namespace SchemaSync.Library.Interfaces
 
 		Database GetDatabase(IDbConnection connection);
 
-		Func<string, IDbConnection> ConnectionMethod { get;  }		
+		Func<string, IDbConnection> ConnectionMethod { get;  }
+
+		SqlSyntax GetDefaultSyntax();
 	}
 }

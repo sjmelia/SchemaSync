@@ -39,7 +39,10 @@ namespace SchemaSync.SqlServer
 					[is_nullable] AS [IsNullable],
 					[def].[definition]  AS [Default],
 					[col].[collation_name] AS [Collation],
-					[col].[max_length] AS [MaxLength],
+					CASE 
+						WHEN TYPE_NAME([system_type_id]) LIKE 'nvar%' THEN ([col].[max_length]/2)
+						ELSE [max_length]
+					END AS [MaxLength],
 					[col].[precision] AS [Precision],
 					[col].[scale] AS [Scale],
 					[col].[column_id] AS [InternalId]

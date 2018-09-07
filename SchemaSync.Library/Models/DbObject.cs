@@ -6,6 +6,11 @@ namespace SchemaSync.Library.Models
 	public abstract class DbObject
 	{
 		/// <summary>
+		/// Set by IsAltered to indicate what was if an object was altered
+		/// </summary>
+		public string AlterDescription { get; protected set; }
+
+		/// <summary>
 		/// Used by SQL Server to identify tables and other top-level database objects
 		/// </summary>
 		public int ObjectId { get; set; }

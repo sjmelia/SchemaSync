@@ -10,6 +10,7 @@ using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
 using System.Reflection;
+using System.Text.RegularExpressions;
 
 namespace SchemaSync.Postulate
 {
@@ -152,7 +153,7 @@ namespace SchemaSync.Postulate
 			return new Column()
 			{
 				Name = pi.GetColumnName(),
-				DataType = _integrator.FindTypeInfo(pi.PropertyType).BaseName,
+				DataType = GetDataType(pi, ref scale),
 				IsNullable = GetPropertyIsNullable(pi),
 				MaxLength = GetPropertyMaxLength(pi),
 				Scale = (scale?.Scale ?? 0),
@@ -160,18 +161,37 @@ namespace SchemaSync.Postulate
 			};
 		}
 
+		private string GetDataType(PropertyInfo pi, ref DecimalPrecisionAttribute decimalAttr)
+		{
+			if (pi.HasAttribute(out ColumnAttribute attr, a => !string.IsNullOrEmpty(a.TypeName)))
+			{
+				const string scalePrecisionPattern = @"\(\d,(\s*)\d\)";
+				string result = attr.TypeName;
+				if (decimalAttr == null && Regex.IsMatch(result.ToLower(), $@"decimal{scalePrecisionPattern}"))
+				{
+					var scalePrecision = Regex.Match(result, scalePrecisionPattern).Value.Substring(1);
+					scalePrecision = scalePrecision.Substring(0, scalePrecision.Length - 1);
+					var parts = scalePrecision.Split(',').Select(s => s.Trim()).Select(s => Convert.ToByte(s)).ToArray();
+					result = "decimal";
+					decimalAttr = new DecimalPrecisionAttribute(parts[0], parts[1]);
+				}
+				return result;
+			}
+			else
+			{
+				return _integrator.FindTypeInfo(pi.PropertyType).BaseName;
+			}
+		}
+
 		private int GetPropertyMaxLength(PropertyInfo pi)
 		{
-			if (pi.HasAttribute(out MaxLengthAttribute attr))
-			{
-				return attr.Length;
-			}
-			return -1;
+			if (pi.HasAttribute(out MaxLengthAttribute attr)) return attr.Length;
+			return 0;
 		}
 
 		private bool GetPropertyIsNullable(PropertyInfo pi)
 		{
-			if (pi.HasAttribute<RequiredAttribute>())
+			if (pi.HasAttribute<RequiredAttribute>() || pi.HasAttribute<PrimaryKeyAttribute>())
 			{
 				return false;
 			}

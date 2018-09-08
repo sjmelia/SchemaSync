@@ -249,7 +249,7 @@ namespace SchemaSync.Postulate
 				CascadeDelete = fk.CascadeDelete,
 				ReferencedTable = typesAndTables[fk.PrimaryType],
 				ReferencingTable = typesAndTables[pi.DeclaringType],
-				Columns = new ForeignKey.Column[] { new ForeignKey.Column() { ReferencingName = pi.GetColumnName(), ReferencedName = pi.DeclaringType.GetIdentityName() } }
+				Columns = new ForeignKey.Column[] { new ForeignKey.Column() { ReferencingName = pi.GetColumnName(), ReferencedName = fk.PrimaryType.GetIdentityName() } }
 			};
 		}
 	}

@@ -43,7 +43,7 @@ namespace SchemaSync.Postulate
 		private Dictionary<Type, Table> GetTypeTableDictionary(Type[] types)
 		{
 			_ignoredObjects = new List<IgnoredObject>();
-			var rules = GetTypeExcludeRules();
+			var rules = GetTypeExcludeRules(_integrator);
 
 			foreach (var rule in rules)
 			{
@@ -78,19 +78,6 @@ namespace SchemaSync.Postulate
 			return source.ToDictionary(row => row.Type, row => row.Table);
 		}
 
-		private bool HasIdentityProperty(Type t)
-		{
-			try
-			{
-				var pi = t.GetIdentityProperty();
-				return (pi != null);
-			}
-			catch
-			{
-				return false;
-			}
-		}
-
 		private string GetClusteredIndex(Type t)
 		{
 			return $"PK_{GetConstraintName(t)}";
@@ -111,12 +98,16 @@ namespace SchemaSync.Postulate
 					Columns = pkColumns.Select((pi, i) => new IndexColumn() { Name = pi.GetColumnName(), Position = i })
 				};
 
-				yield return new Index()
+				var identity = t.GetIdentityProperty();
+				if (identity != null)
 				{
-					Name = $"U_{constraintName}_{identityCol}",
-					Type = IndexType.UniqueConstraint,
-					Columns = new IndexColumn[] { new IndexColumn() { Name = identityCol, Position = 1 } }
-				};
+					yield return new Index()
+					{
+						Name = $"U_{constraintName}_{identityCol}",
+						Type = IndexType.UniqueConstraint,
+						Columns = new IndexColumn[] { new IndexColumn() { Name = identityCol, Position = 1 } }
+					};
+				}
 			}
 			else
 			{
@@ -125,6 +116,29 @@ namespace SchemaSync.Postulate
 					Name = $"PK_{constraintName}",
 					Type = IndexType.PrimaryKey,
 					Columns = new IndexColumn[] { new IndexColumn() { Name = identityCol, Position = 1 } }
+				};
+			}
+
+			var uniqueColumns = _integrator.GetMappedColumns(t).Where(pi => pi.HasAttribute<UniqueKeyAttribute>());
+			foreach (var col in uniqueColumns)
+			{
+				yield return new Index()
+				{
+					Name = $"U_{constraintName}_{col.GetColumnName()}",
+					Type = IndexType.UniqueConstraint,
+					Columns = new IndexColumn[] { new IndexColumn() { Name = col.GetColumnName(), Position = 1 } }
+				};
+			}
+
+			var attr = t.GetAttribute<UniqueKeyAttribute>();
+			if (attr != null)
+			{
+				var columnNames = string.Join("_", attr.ColumnNames);
+				yield return new Index()
+				{
+					Name = $"U_{constraintName}_{columnNames}",
+					Type = IndexType.UniqueConstraint,
+					Columns = attr.ColumnNames.Select((col, index) => new IndexColumn() { Name = col, Position = index })
 				};
 			}
 		}

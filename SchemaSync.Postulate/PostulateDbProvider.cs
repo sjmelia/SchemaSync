@@ -1,7 +1,6 @@
 ﻿using Postulate.Lite.Core.Attributes;
 using Postulate.Lite.Core.Extensions;
 using Postulate.Lite.SqlServer;
-using SchemaSync.Library;
 using SchemaSync.Library.Interfaces;
 using SchemaSync.Library.Models;
 using System;
@@ -15,11 +14,11 @@ using System.Text.RegularExpressions;
 namespace SchemaSync.Postulate
 {
 	public partial class PostulateDbProvider : IDbAssemblyProvider
-	{		
+	{
 		private SqlServerIntegrator _integrator = new SqlServerIntegrator();
-		List<IgnoredObject> _ignoredObjects = null;
+		private List<IgnoredObject> _ignoredObjects = null;
 
-		public ObjectTypeFlags ObjectTypes => ObjectTypeFlags.Tables | ObjectTypeFlags.ForeignKeys;		
+		public ObjectTypeFlags ObjectTypes => ObjectTypeFlags.Tables | ObjectTypeFlags.ForeignKeys;
 
 		public Database GetDatabase(string path)
 		{
@@ -86,7 +85,7 @@ namespace SchemaSync.Postulate
 				var pi = t.GetIdentityProperty();
 				return (pi != null);
 			}
-			catch 
+			catch
 			{
 				return false;
 			}
@@ -203,9 +202,9 @@ namespace SchemaSync.Postulate
 			else
 			{
 				return pi.PropertyType.IsNullable();
-			}				
+			}
 		}
-		
+
 		private string GetTableName(Type t)
 		{
 			return (t.HasAttribute(out TableAttribute attr, (a) => !string.IsNullOrEmpty(a.Name))) ? attr.Name : t.Name;
@@ -238,6 +237,6 @@ namespace SchemaSync.Postulate
 				ReferencingTable = typesAndTables[pi.DeclaringType],
 				Columns = new ForeignKey.Column[] { new ForeignKey.Column() { ReferencingName = pi.GetColumnName(), ReferencedName = pi.DeclaringType.GetIdentityName() } }
 			};
-		}		
+		}
 	}
 }

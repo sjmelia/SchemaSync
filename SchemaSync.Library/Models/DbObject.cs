@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 
 namespace SchemaSync.Library.Models
@@ -72,5 +73,7 @@ namespace SchemaSync.Library.Models
 				foreach (var cmd in @object.CreateCommands(syntax)) yield return cmd;
 			}
 		}
+
+		public Type SourceType { get; set; }
 	}
 }

@@ -22,7 +22,8 @@ namespace SchemaSync.Library.Models
 		public IEnumerable<Table> Tables { get; set; }
 		public IEnumerable<ForeignKey> ForeignKeys { get; set; }
 		public IEnumerable<Procedure> Procedures { get; set; }
-		public IEnumerable<View> Views { get; set; }		
+		public IEnumerable<View> Views { get; set; }
+		public IEnumerable<IgnoredObject> IgnoredObjects { get; set; }
 
 		public void SaveScript(SqlSyntax syntax, string path)
 		{

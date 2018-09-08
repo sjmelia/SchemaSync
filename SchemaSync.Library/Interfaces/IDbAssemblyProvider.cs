@@ -8,8 +8,6 @@ namespace SchemaSync.Library.Interfaces
 	{
 		ObjectTypeFlags ObjectTypes { get; }
 
-		Database GetDatabase(Assembly assembly);
-
-		IEnumerable<IgnoredTypeInfo> IgnoredTypes { get; }
+		Database GetDatabase(Assembly assembly);		
 	}
 }

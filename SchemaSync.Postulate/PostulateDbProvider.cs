@@ -17,7 +17,7 @@ namespace SchemaSync.Postulate
 	public partial class PostulateDbProvider : IDbAssemblyProvider
 	{		
 		private SqlServerIntegrator _integrator = new SqlServerIntegrator();
-		private List<IgnoredTypeInfo> _ignoredTypes = null;
+		List<IgnoredObject> _ignoredObjects = null;
 
 		public ObjectTypeFlags ObjectTypes => ObjectTypeFlags.Tables | ObjectTypeFlags.ForeignKeys;		
 
@@ -29,11 +29,6 @@ namespace SchemaSync.Postulate
 
 		public string DefaultSchema { get; set; } = "dbo";
 
-		public IEnumerable<IgnoredTypeInfo> IgnoredTypes
-		{
-			get { return _ignoredTypes; }
-		}
-
 		public Database GetDatabase(Assembly assembly)
 		{
 			var types = assembly.GetExportedTypes();
@@ -42,25 +37,25 @@ namespace SchemaSync.Postulate
 			var db = new Database();
 			db.Tables = typeTableMap.Select(kp => kp.Value);
 			db.ForeignKeys = GetForeignKeys(typeTableMap);
+			db.IgnoredObjects = _ignoredObjects;
 			return db;
 		}
 
 		private Dictionary<Type, Table> GetTypeTableDictionary(Type[] types)
 		{
-			_ignoredTypes = new List<IgnoredTypeInfo>();
-
+			_ignoredObjects = new List<IgnoredObject>();
 			var rules = GetTypeExcludeRules();
 
 			foreach (var rule in rules)
 			{
-				_ignoredTypes.AddRange(
+				_ignoredObjects.AddRange(
 					types.Where(t => rule.Rule.Invoke(t))
-					.Select(t => new IgnoredTypeInfo() { Type = t, Reason = rule.Description })
+					.Select(t => new IgnoredObject() { Object = new Table() { Name = t.Name, SourceType = t }, Reason = rule.Description })
 				);
 			}
 
 			var source = types
-				.Where(t => !_ignoredTypes.Any(it => it.Type.Equals(t)))
+				.Where(t => !_ignoredObjects.Any(obj => obj.Object.SourceType.Equals(t)))
 				.Select(t => new
 				{
 					Type = t,

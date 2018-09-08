@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 
 namespace SchemaSync.Library.Models
@@ -8,7 +9,7 @@ namespace SchemaSync.Library.Models
 		public string Schema { get; set; }
 		public string Name { get; set; }
 		public string IdentityColumn { get; set; }
-		public string ClusteredIndex { get; set; }		
+		public string ClusteredIndex { get; set; }				
 		public int RowCount { get; set; }
 
 		/// <summary>

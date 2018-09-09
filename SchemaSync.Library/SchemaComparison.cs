@@ -100,64 +100,109 @@ namespace SchemaSync.Library
 			return results;
 		}
 
-		public IEnumerable<string> GetScriptCommands(SqlSyntax syntax)
+		public IEnumerable<ScriptBlock> GetScriptBlocks(SqlSyntax syntax)
 		{
 			var createColumns = Create.OfType<Column>();
 			var createOther = Create.Where(obj => !obj.GetType().Equals(typeof(Column)));
 
-			foreach (var tbl in createColumns.GroupBy(item => item.Table))
+			foreach (var columnGrp in createColumns.GroupBy(item => item.Table))
 			{
-				string columnList = string.Join(", ", tbl.Select(col => col.Name));
+				string columnList = string.Join(", ", columnGrp.Select(col => col.Name));
 
-				if (tbl.Key.IsEmpty)
-				{					
-					yield return $"{syntax.CommentStart} rebuilding empty table {tbl.Key} to add column(s) {columnList}";
-
-					var deps = tbl.Key.GetDependencies(Destination);
-					foreach (var obj in deps)
+				if (columnGrp.Key.IsEmpty)
+				{
+					yield return new ScriptBlock()
 					{
-						foreach (var cmd in obj.DropCommands(syntax)) yield return syntax.ApplyDelimiters(cmd);
-					}
-
-					foreach (var cmd in tbl.Key.AlterCommands(syntax)) yield return syntax.ApplyDelimiters(cmd);
-
-					foreach (var obj in deps)
-					{
-						foreach (var cmd in obj.CreateCommands(syntax)) yield return syntax.ApplyDelimiters(cmd);
-					}
+						Objects = columnGrp,
+						Commands = RebuildCommands(syntax, columnGrp, columnList)
+					};
 				}
 				else
-				{
-					yield return $"{syntax.CommentStart} table {tbl.Key} has {tbl.Key.RowCount:n0} rows, so new columns are added individually";
-
-					foreach (var col in tbl)
+				{										
+					foreach (var col in columnGrp)
 					{
-						foreach (var cmd in col.CreateCommands(syntax)) yield return syntax.ApplyDelimiters(cmd);
+						yield return new ScriptBlock()
+						{
+							Objects = new DbObject[] { col },
+							Commands = CreateCommands(syntax, col)
+						};						
 					}
 				}
 			}
 
 			foreach (var create in createOther)
 			{
-
-				foreach (var cmd in create.CreateCommands(syntax)) yield return syntax.ApplyDelimiters(cmd);
+				yield return new ScriptBlock()
+				{
+					Objects = new DbObject[] { create },
+					Commands = CreateCommands(syntax, create)
+				};				
 			}
 
 			foreach (var alter in Alter)
 			{
-				foreach (var cmd in alter.AlterCommands(syntax)) yield return syntax.ApplyDelimiters(cmd);
+				yield return new ScriptBlock()
+				{
+					Objects = new DbObject[] { alter },
+					Commands = AlterCommands(syntax, alter)
+				};
 			}
 
 			foreach (var drop in Drop)
 			{
-				var deps = drop.GetDependencies(Destination);
-				foreach (var obj in deps)
+				yield return new ScriptBlock()
 				{
-					foreach (var cmd in obj.DropCommands(syntax)) yield return syntax.ApplyDelimiters(cmd);
-				}
-
-				foreach (var cmd in drop.DropCommands(syntax)) yield return syntax.ApplyDelimiters(cmd);
+					Objects = new DbObject[] { drop },
+					Commands = DropCommands(syntax, drop)
+				};
 			}
+
+			//todo: need FK creation from table rebuilds
+		}
+
+		private IEnumerable<string> DropCommands(SqlSyntax syntax, DbObject drop)
+		{
+			var deps = drop.GetDependencies(Destination);
+			foreach (var obj in deps)
+			{
+				foreach (var cmd in obj.DropCommands(syntax)) yield return syntax.ApplyDelimiters(cmd);
+			}
+
+			foreach (var cmd in drop.DropCommands(syntax)) yield return syntax.ApplyDelimiters(cmd);
+		}
+
+		private IEnumerable<string> AlterCommands(SqlSyntax syntax, DbObject alter)
+		{
+			foreach (var cmd in alter.AlterCommands(syntax)) yield return syntax.ApplyDelimiters(cmd);
+		}
+
+		private IEnumerable<string> CreateCommands(SqlSyntax syntax, DbObject @object)
+		{
+			//yield return $"{syntax.CommentStart} table {tbl.Key} has {tbl.Key.RowCount:n0} rows, so new columns are added individually";
+			foreach (var cmd in @object.CreateCommands(syntax)) yield return syntax.ApplyDelimiters(cmd);
+		}
+
+		private IEnumerable<string> RebuildCommands(SqlSyntax syntax, IGrouping<Table, Column> tblGrp, string columnList)
+		{
+			yield return $"{syntax.CommentStart} rebuilding empty table {tblGrp.Key} to add column(s) {columnList}";
+
+			var deps = tblGrp.Key.GetDependencies(Destination);
+			foreach (var obj in deps)
+			{
+				foreach (var cmd in obj.DropCommands(syntax)) yield return syntax.ApplyDelimiters(cmd);
+			}
+
+			foreach (var cmd in tblGrp.Key.AlterCommands(syntax)) yield return syntax.ApplyDelimiters(cmd);
+
+			foreach (var obj in deps)
+			{
+				foreach (var cmd in obj.CreateCommands(syntax)) yield return syntax.ApplyDelimiters(cmd);
+			}
+		}
+
+		public IEnumerable<string> GetScriptCommands(SqlSyntax syntax)
+		{
+			return GetScriptBlocks(syntax).SelectMany(block => block.Commands);
 		}
 
 		public void SaveScript(SqlSyntax syntax, string path)

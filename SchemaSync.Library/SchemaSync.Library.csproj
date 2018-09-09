@@ -54,6 +54,7 @@
     <Compile Include="Models\View.cs" />
     <Compile Include="SchemaComparison.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="ScriptBlock.cs" />
     <Compile Include="SqlSyntax.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

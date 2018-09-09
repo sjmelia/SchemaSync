@@ -65,5 +65,10 @@ namespace SchemaSync.Library.Models
 		{
 			return database.ForeignKeys.Where(fk => fk.ReferencedTable.Equals(this));
 		}
+
+		public IEnumerable<ForeignKey> GetForeignKeys(Database database)
+		{
+			return database.ForeignKeys.Where(fk => fk.ReferencingTable.Equals(this));
+		}
 	}
 }

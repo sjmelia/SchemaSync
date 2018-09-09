@@ -105,6 +105,8 @@ namespace SchemaSync.Library
 			var createColumns = Create.OfType<Column>();
 			var createOther = Create.Where(obj => !obj.GetType().Equals(typeof(Column)));
 
+			List<ScriptBlock> fkScript = new List<ScriptBlock>();
+
 			foreach (var columnGrp in createColumns.GroupBy(item => item.Table))
 			{
 				string columnList = string.Join(", ", columnGrp.Select(col => col.Name));
@@ -116,6 +118,15 @@ namespace SchemaSync.Library
 						Objects = columnGrp,
 						Commands = RebuildCommands(syntax, columnGrp, columnList)
 					};
+
+					foreach (var fk in columnGrp.Key.GetForeignKeys(Source))
+					{
+						fkScript.Add(new ScriptBlock()
+						{
+							Objects = columnGrp,
+							Commands = CreateCommands(syntax, fk)
+						});
+					}
 				}
 				else
 				{										
@@ -125,7 +136,7 @@ namespace SchemaSync.Library
 						{
 							Objects = new DbObject[] { col },
 							Commands = CreateCommands(syntax, col)
-						};						
+						};
 					}
 				}
 			}
@@ -156,8 +167,8 @@ namespace SchemaSync.Library
 					Commands = DropCommands(syntax, drop)
 				};
 			}
-
-			//todo: need FK creation from table rebuilds
+			
+			foreach (var fk in fkScript) yield return fk;
 		}
 
 		private IEnumerable<string> DropCommands(SqlSyntax syntax, DbObject drop)

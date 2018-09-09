@@ -1,4 +1,6 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace SchemaSync.Library.Models
 {
@@ -126,6 +128,14 @@ namespace SchemaSync.Library.Models
 			}
 			
 			return false;
+		}
+
+		public bool IsForeignKey(Database database, out ForeignKey foreignKey)
+		{
+			foreignKey = database.ForeignKeys.SingleOrDefault(fk => 
+				fk.ReferencingTable.Equals(Table) &&
+				fk.Columns.Any(col => col.ReferencingName.Equals(Name)));
+			return (foreignKey != null);
 		}
 	}
 }

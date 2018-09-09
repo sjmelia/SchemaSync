@@ -115,6 +115,7 @@ namespace SchemaSync.Library
 				{
 					yield return new ScriptBlock()
 					{
+						ActionType = ActionType.Create,
 						Objects = columnGrp,
 						Commands = RebuildCommands(syntax, columnGrp, columnList)
 					};
@@ -123,6 +124,7 @@ namespace SchemaSync.Library
 					{
 						fkScript.Add(new ScriptBlock()
 						{
+							ActionType = ActionType.Create,
 							Objects = columnGrp,
 							Commands = CreateCommands(syntax, fk)
 						});
@@ -134,9 +136,20 @@ namespace SchemaSync.Library
 					{
 						yield return new ScriptBlock()
 						{
+							ActionType = ActionType.Create,
 							Objects = new DbObject[] { col },
 							Commands = CreateCommands(syntax, col)
 						};
+
+						if (col.IsForeignKey(Source, out ForeignKey fk))
+						{
+							fkScript.Add(new ScriptBlock()
+							{
+								ActionType = ActionType.Create,
+								Objects = new DbObject[] { col },
+								Commands = CreateCommands(syntax, fk)
+							});
+						}
 					}
 				}
 			}
@@ -145,6 +158,7 @@ namespace SchemaSync.Library
 			{
 				yield return new ScriptBlock()
 				{
+					ActionType = ActionType.Create,
 					Objects = new DbObject[] { create },
 					Commands = CreateCommands(syntax, create)
 				};				
@@ -154,6 +168,7 @@ namespace SchemaSync.Library
 			{
 				yield return new ScriptBlock()
 				{
+					ActionType = ActionType.Alter,
 					Objects = new DbObject[] { alter },
 					Commands = AlterCommands(syntax, alter)
 				};
@@ -163,6 +178,7 @@ namespace SchemaSync.Library
 			{
 				yield return new ScriptBlock()
 				{
+					ActionType = ActionType.Drop,
 					Objects = new DbObject[] { drop },
 					Commands = DropCommands(syntax, drop)
 				};

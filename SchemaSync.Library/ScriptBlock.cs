@@ -1,14 +1,18 @@
 ﻿using SchemaSync.Library.Models;
-using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace SchemaSync.Library
 {
+	public enum ActionType
+	{
+		Create,
+		Alter,
+		Drop
+	}
+
 	public class ScriptBlock
 	{
+		public ActionType ActionType { get; set; }
 		public IEnumerable<DbObject> Objects { get; set; }
 		public IEnumerable<string> Commands { get; set; }
 	}

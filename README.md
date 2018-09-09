@@ -16,3 +16,6 @@ To support a particular ORM model class assembly or database backend, there's an
 
 As I said above, SchemaSync has no particular ORM dependency, but I do want it to work with [Postulate Lite](https://github.com/adamosoftware/Postulate.Lite). So, a [Postulate Provider](https://github.com/adamosoftware/SchemaSync/tree/master/SchemaSync.Postulate) is part of the solution. Likewise, there's a [SQL Server Provider](https://github.com/adamosoftware/SchemaSync/tree/master/SchemaSync.SqlServer).
 
+This is coming together in a WinForms app I'm working on that will become a standalone tool. (This repo is private.) I'll post a video when I have more to show.
+
+![merge app](https://adamosoftware.blob.core.windows.net:443/images/schema_diff_merge.png)

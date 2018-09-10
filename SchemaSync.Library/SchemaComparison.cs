@@ -229,7 +229,7 @@ namespace SchemaSync.Library
 
 		public IEnumerable<string> GetScriptCommands(SqlSyntax syntax)
 		{
-			return GetScriptBlocks(syntax).SelectMany(block => block.Commands);
+			return GetScriptBlocks(syntax).SelectMany(block => block.GetCommands(syntax));
 		}
 
 		public void SaveScript(SqlSyntax syntax, string path)

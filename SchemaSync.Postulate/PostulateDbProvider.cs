@@ -166,8 +166,18 @@ namespace SchemaSync.Postulate
 				MaxLength = GetPropertyMaxLength(pi),
 				Scale = (scale?.Scale ?? 0),
 				Precision = (scale?.Precision ?? 0),
-				Expression = GetCalculationExpression(pi)
+				Expression = GetCalculationExpression(pi),
+				DefaultExpression = GetDefaultExpression(pi)
 			};
+		}
+
+		private string GetDefaultExpression(PropertyInfo pi)
+		{			
+			if (pi.HasAttribute(out DefaultExpressionAttribute attr))
+			{
+				return attr.Expression;
+			}
+			return null;
 		}
 
 		private string GetCalculationExpression(PropertyInfo pi)

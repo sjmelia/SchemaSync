@@ -15,7 +15,16 @@ namespace SchemaSync.Library.Models
 		public int MaxLength { get; set; }
 		public int Scale { get; set; }
 		public int Precision { get; set; }
+
+		/// <summary>
+		/// Expression used for computed column
+		/// </summary>
 		public string Expression { get; set; }
+
+		/// <summary>
+		/// Expression to use with UPDATE...SET when creating required column in table with data
+		/// </summary>
+		public string DefaultExpression { get; set; }
 
 		public override IEnumerable<string> AlterCommands(SqlSyntax syntax)
 		{
@@ -25,7 +34,16 @@ namespace SchemaSync.Library.Models
 
 		public override IEnumerable<string> CreateCommands(SqlSyntax syntax)
 		{
-			yield return $"ALTER TABLE <{Table}> ADD {Definition(syntax)}";
+			if (!Table.IsEmpty && !IsNullable && !string.IsNullOrEmpty(DefaultExpression))
+			{
+				yield return $"ALTER TABLE <{Table}> ADD {Definition(syntax, true)}";
+				yield return $"UPDATE <{Table}> SET <{Name}>={DefaultExpression}";
+				yield return $"ALTER TABLE <{Table}> ALTER COLUMN {Definition(syntax)}";
+			}
+			else
+			{
+				yield return $"ALTER TABLE <{Table}> ADD {Definition(syntax)}";
+			}			
 		}
 
 		public override IEnumerable<string> DropCommands(SqlSyntax syntax)
@@ -48,7 +66,7 @@ namespace SchemaSync.Library.Models
 			return false;
 		}
 
-		internal string Definition(SqlSyntax syntax)
+		internal string Definition(SqlSyntax syntax, bool? nullableOverride = null)
 		{
 			string result = null;
 
@@ -58,8 +76,9 @@ namespace SchemaSync.Library.Models
 			}
 			else
 			{
+				bool isNull = (!nullableOverride.HasValue) ? IsNullable : nullableOverride.Value;
 				string identity = (Table.IdentityColumn?.Equals(Name) ?? false) ? $" {syntax.IdentitySyntax}" : string.Empty;
-				result = $"<{Name}> {syntax.GetDataTypeDefinition(this)}{identity} {((IsNullable) ? "NULL" : "NOT NULL")}";
+				result = $"<{Name}> {syntax.GetDataTypeDefinition(this)}{identity} {((isNull) ? "NULL" : "NOT NULL")}";
 				if (!string.IsNullOrEmpty(Default)) result += $" DEFAULT ({Default})";
 			}
 			

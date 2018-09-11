@@ -50,6 +50,7 @@
     <Compile Include="Models\Index.cs" />
     <Compile Include="Models\Procedure.cs" />
     <Compile Include="Models\Database.cs" />
+    <Compile Include="Models\Schema.cs" />
     <Compile Include="Models\Table.cs" />
     <Compile Include="Models\View.cs" />
     <Compile Include="SchemaComparison.cs" />

@@ -24,6 +24,7 @@ namespace SchemaSync.SqlServer
 		public Database GetDatabase(IDbConnection connection)
 		{
 			Database db = new Database();
+			db.Schemas = GetSchemas(connection);
 			db.Tables = GetTables(connection);
 			db.ForeignKeys = GetForeignKeys(connection);
 			return db;

@@ -39,6 +39,9 @@ namespace SchemaSync.Library
 		{
 			List<DbObject> results = new List<DbObject>();
 
+			var newSchemas = source.Schemas.Where(s => !destination.Schemas.Contains(s));
+			results.AddRange(newSchemas);
+
 			var newTables = source.Tables.Where(t => !destination.Tables.Contains(t));
 			results.AddRange(newTables);
 
@@ -80,6 +83,9 @@ namespace SchemaSync.Library
 		private IEnumerable<DbObject> CompareDropObjects(Database source, Database destination)
 		{
 			List<DbObject> results = new List<DbObject>();
+
+			var droppedSchemas = destination.Schemas.Where(s => !source.Schemas.Contains(s));
+			results.AddRange(droppedSchemas);
 
 			var droppedTables = destination.Tables.Where(t => !source.Tables.Contains(t));
 			results.AddRange(droppedTables);

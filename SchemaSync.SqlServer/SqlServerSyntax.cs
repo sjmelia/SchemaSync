@@ -1,8 +1,5 @@
 ﻿using SchemaSync.Library;
 using SchemaSync.Library.Models;
-using System.Collections.Generic;
-using System.Data;
-using System.Linq;
 
 namespace SchemaSync.SqlServer
 {
@@ -31,16 +28,6 @@ namespace SchemaSync.SqlServer
 			}
 
 			return result;
-		}
-
-		public override IEnumerable<string> DatabaseCommands(Database database)
-		{
-			var schemas = database.Tables.Select(t => t.Schema).GroupBy(s => s).Select(grp => grp.Key).ToArray();
-
-			foreach (string schema in schemas)
-			{
-				yield return $"-- uncomment this next line as needed\r\n-- CREATE SCHEMA [{schema}]";
-			}
 		}
 	}
 }

@@ -9,7 +9,7 @@ namespace SchemaSync.SqlServer
 {
 	public partial class SqlServerDbProvider : IDbConnectionProvider
 	{
-		public ObjectTypeFlags ObjectTypes => ObjectTypeFlags.Tables | ObjectTypeFlags.ForeignKeys;
+		public ObjectTypeFlags ObjectTypes => ObjectTypeFlags.Tables | ObjectTypeFlags.ForeignKeys | ObjectTypeFlags.Schemas;
 
 		public Func<string, IDbConnection> ConnectionMethod => (connectionString) => new SqlConnection(connectionString);
 

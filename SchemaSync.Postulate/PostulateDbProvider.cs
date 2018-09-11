@@ -101,7 +101,7 @@ namespace SchemaSync.Postulate
 				{
 					Name = $"PK_{constraintName}",
 					Type = IndexType.PrimaryKey,
-					Columns = pkColumns.Select((pi, i) => new IndexColumn() { Name = pi.GetColumnName(), Position = i })
+					Columns = pkColumns.Select((pi, i) => new IndexColumn() { Name = pi.GetColumnName(), Position = i + 1 })
 				};
 
 				var identity = t.GetIdentityProperty();
@@ -132,7 +132,7 @@ namespace SchemaSync.Postulate
 				{
 					Name = $"U_{constraintName}_{col.GetColumnName()}",
 					Type = IndexType.UniqueConstraint,
-					Columns = new IndexColumn[] { new IndexColumn() { Name = col.GetColumnName(), Position = 1 } }
+					Columns = new IndexColumn[] { new IndexColumn() { Name = col.GetColumnName(), Position = 1, SortDirection = SortDirection.Ascending } }
 				};
 			}
 
@@ -144,7 +144,7 @@ namespace SchemaSync.Postulate
 				{
 					Name = $"U_{constraintName}_{columnNames}",
 					Type = IndexType.UniqueConstraint,
-					Columns = attr.ColumnNames.Select((col, index) => new IndexColumn() { Name = col, Position = index })
+					Columns = attr.ColumnNames.Select((col, index) => new IndexColumn() { Name = col, Position = index + 1 })
 				};
 			}
 		}

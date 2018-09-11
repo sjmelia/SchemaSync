@@ -77,6 +77,12 @@ namespace SchemaSync.Library
 							 select s;
 			results.AddRange(alteredKFs);
 
+			var alteredIndexes = from s in source.Tables.SelectMany(t => t.Indexes)
+								 join d in destination.Tables.SelectMany(t => t.Indexes) on s equals d
+								 where s.IsAltered(d)
+								 select s;
+			results.AddRange(alteredIndexes);
+
 			return results;
 		}
 

@@ -49,12 +49,40 @@ namespace SchemaSync.Library.Models
 
 		public override IEnumerable<string> DropCommands(SqlSyntax syntax)
 		{
-			yield return $"DROP INDEX <{Name}> ON <{Table}>";
+			switch (Type)
+			{
+				case IndexType.UniqueIndex:
+				case IndexType.NonUnique:
+					yield return $"DROP INDEX <{Name}> ON <{Table}>";
+					break;
+
+				case IndexType.UniqueConstraint:
+				case IndexType.PrimaryKey:
+					yield return $"ALTER TABLE <{Table}> DROP CONSTRAINT <{Name}>";
+					break;
+			}			
+		}
+
+		public override IEnumerable<string> AlterCommands(SqlSyntax syntax)
+		{
+			if (!string.IsNullOrEmpty(AlterDescription)) yield return $"{syntax.CommentStart} {AlterDescription}";
+			foreach (var cmd in base.AlterCommands(syntax)) yield return cmd;
 		}
 
 		public override bool IsAltered(DbObject compare)
 		{
-			throw new System.NotImplementedException();
+			var test = compare as Index;
+			if (test != null)
+			{
+				if (!test.Columns.SequenceEqual(Columns))
+				{
+					string srcColumns = string.Join(", ", Columns.Select(col => $"{col.Name}-{col.SortDirection}"));
+					string destColumns = string.Join(", ", test.Columns.Select(col => $"{col.Name}-{col.SortDirection}"));
+					AlterDescription = $"Index columns changed from {srcColumns} to {destColumns}";
+					return true;
+				}
+			}
+			return false;
 		}
 
 		public override bool Equals(object obj)
@@ -68,6 +96,11 @@ namespace SchemaSync.Library.Models
 			return false;
 		}
 
+		public override string ToString()
+		{
+			return $"{Table}.{Name}";
+		}
+
 		public override int GetHashCode()
 		{
 			return Table.GetHashCode() + Name.ToLower().GetHashCode();
@@ -79,5 +112,20 @@ namespace SchemaSync.Library.Models
 		public string Name { get; set; }
 		public SortDirection SortDirection { get; set; } = SortDirection.Ascending;
 		public int Position { get; set; }
+
+		public override bool Equals(object obj)
+		{
+			IndexColumn test = obj as IndexColumn;
+			if (test != null)
+			{
+				return test.Name.ToLower().Equals(Name.ToLower()) && test.Position == Position && test.SortDirection == SortDirection;
+			}
+			return false;
+		}
+
+		public override int GetHashCode()
+		{
+			return Name.ToLower().GetHashCode() + Position.GetHashCode() + SortDirection.GetHashCode();
+		}
 	}
 }

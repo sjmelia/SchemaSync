@@ -66,25 +66,9 @@ namespace SchemaSync.Library.Models
 			return Enumerable.Empty<DbObject>();
 		}
 
-		public IEnumerable<string> Rebuild(Database database, SqlSyntax syntax)
-		{
-			var dependencies = GetDependencies(database);
-
-			foreach (var @object in dependencies)
-			{
-				foreach (var cmd in @object.DropCommands(syntax)) yield return cmd;
-			}
-
-			foreach (var cmd in DropCommands(syntax)) yield return cmd;
-
-			foreach (var cmd in CreateCommands(syntax)) yield return cmd;
-
-			foreach (var @object in dependencies)
-			{
-				foreach (var cmd in @object.CreateCommands(syntax)) yield return cmd;
-			}
-		}
-
+		/// <summary>
+		/// Used to map to an ORM type, as needed -- doesn't make sense for IDbConnectionProviders
+		/// </summary>
 		public Type SourceType { get; set; }
 	}
 }

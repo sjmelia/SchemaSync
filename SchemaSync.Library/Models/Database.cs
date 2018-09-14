@@ -1,24 +1,24 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Data;
 using System.IO;
-using System.Reflection;
 
 namespace SchemaSync.Library.Models
 {
 	[Flags]
 	public enum ObjectTypeFlags
 	{
-		Tables = 1,
-		ForeignKeys = 2,
-		Procedures = 4,
-		Views = 8,		
-		All = Tables | ForeignKeys | Procedures | Views
+		Schemas = 1, 
+		Tables = 2,
+		ForeignKeys = 4,
+		Procedures = 8,
+		Views = 16,
+		All = Schemas | Tables | ForeignKeys | Procedures | Views
 	}
 
 	public class Database
 	{
 		public string Collation { get; set; }
+		public IEnumerable<Schema> Schemas { get; set; }
 		public IEnumerable<Table> Tables { get; set; }
 		public IEnumerable<ForeignKey> ForeignKeys { get; set; }
 		public IEnumerable<Procedure> Procedures { get; set; }

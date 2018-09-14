@@ -44,6 +44,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="SqlServerDbProvider_GetForeignKeys.cs" />
+    <Compile Include="SqlServerDbProvider_GetSchemas.cs" />
     <Compile Include="SqlServerDbProvider_GetTables.cs" />
     <Compile Include="Models\ForeignKeysResult.cs" />
     <Compile Include="SqlServerDbProvider.cs" />

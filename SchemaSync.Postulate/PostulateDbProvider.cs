@@ -35,6 +35,12 @@ namespace SchemaSync.Postulate
 
 			var db = new Database();
 			db.Tables = typeTableMap.Select(kp => kp.Value);
+
+			List<Schema> schemas = typeTableMap.Select(kp => kp.Value.Schema).GroupBy(s => s).Select(grp => new Schema() { Name = grp.Key }).ToList();
+			var defaultSchema = new Schema() { Name = DefaultSchema };
+			if (!schemas.Contains(defaultSchema)) schemas.Add(defaultSchema);
+
+			db.Schemas = schemas;
 			db.ForeignKeys = GetForeignKeys(typeTableMap);
 			db.IgnoredObjects = _ignoredObjects;
 			return db;

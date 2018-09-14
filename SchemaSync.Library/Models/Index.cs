@@ -76,9 +76,9 @@ namespace SchemaSync.Library.Models
 			{
 				if (!test.Columns.SequenceEqual(Columns))
 				{
-					string srcColumns = string.Join(", ", Columns.Select(col => $"{col.Name}-{col.SortDirection}"));
-					string destColumns = string.Join(", ", test.Columns.Select(col => $"{col.Name}-{col.SortDirection}"));
-					AlterDescription = $"Index columns changed from {srcColumns} to {destColumns}";
+					string newColumns = string.Join(", ", Columns.Select(col => $"{col.Name}-{col.SortDirection}"));
+					string oldColumns = string.Join(", ", test.Columns.Select(col => $"{col.Name}-{col.SortDirection}"));
+					AlterDescription = $"Index columns changed from {oldColumns} to {newColumns}";
 					return true;
 				}
 			}

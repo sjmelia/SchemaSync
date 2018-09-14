@@ -26,7 +26,7 @@ namespace SchemaSync.Library.Models
 		/// </summary>
 		public string DefaultExpression { get; set; }
 
-		public override IEnumerable<string> AlterCommands(SqlSyntax syntax)
+		public override IEnumerable<string> AlterCommands(SqlSyntax syntax, Database database)
 		{
 			if (!string.IsNullOrEmpty(AlterDescription)) yield return $"{syntax.CommentStart} {AlterDescription}";
 			yield return $"ALTER TABLE <{Table}> ALTER COLUMN {Definition(syntax)}";

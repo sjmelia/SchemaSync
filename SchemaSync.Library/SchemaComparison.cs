@@ -212,7 +212,7 @@ namespace SchemaSync.Library
 
 		private IEnumerable<string> AlterCommands(SqlSyntax syntax, DbObject alter)
 		{
-			foreach (var cmd in alter.AlterCommands(syntax)) yield return syntax.ApplyDelimiters(cmd);
+			foreach (var cmd in alter.AlterCommands(syntax, Source)) yield return syntax.ApplyDelimiters(cmd);
 		}
 
 		private IEnumerable<string> CreateCommands(SqlSyntax syntax, DbObject @object)
@@ -231,7 +231,7 @@ namespace SchemaSync.Library
 				foreach (var cmd in obj.DropCommands(syntax)) yield return syntax.ApplyDelimiters(cmd);
 			}
 
-			foreach (var cmd in tblGrp.Key.AlterCommands(syntax)) yield return syntax.ApplyDelimiters(cmd);
+			foreach (var cmd in tblGrp.Key.AlterCommands(syntax, Source)) yield return syntax.ApplyDelimiters(cmd);
 
 			foreach (var obj in deps)
 			{

@@ -63,10 +63,10 @@ namespace SchemaSync.Library.Models
 			}			
 		}
 
-		public override IEnumerable<string> AlterCommands(SqlSyntax syntax)
+		public override IEnumerable<string> AlterCommands(SqlSyntax syntax, Database database)
 		{
 			if (!string.IsNullOrEmpty(AlterDescription)) yield return $"{syntax.CommentStart} {AlterDescription}";
-			foreach (var cmd in base.AlterCommands(syntax)) yield return cmd;
+			foreach (var cmd in base.AlterCommands(syntax, database)) yield return cmd;
 		}
 
 		public override bool IsAltered(DbObject compare)
@@ -78,11 +78,20 @@ namespace SchemaSync.Library.Models
 				{
 					string newColumns = string.Join(", ", Columns.Select(col => $"{col.Name}-{col.SortDirection}"));
 					string oldColumns = string.Join(", ", test.Columns.Select(col => $"{col.Name}-{col.SortDirection}"));
-					AlterDescription = $"Index columns changed from {oldColumns} to {newColumns}";
+					AlterDescription = $"Index {Name} columns changed from {oldColumns} to {newColumns}";
 					return true;
 				}
 			}
 			return false;
+		}
+
+		public override IEnumerable<DbObject> GetDependencies(Database database)
+		{
+			if (Type != IndexType.NonUnique)
+			{
+				return database.ForeignKeys.Where(fk => fk.ReferencedTable.Equals(this.Table));
+			}
+			return base.GetDependencies(database);
 		}
 
 		public override bool Equals(object obj)

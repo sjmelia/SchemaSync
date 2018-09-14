@@ -41,10 +41,21 @@ namespace SchemaSync.Library.Models
 		/// Generates the SQL ALTER statement(s) for an object.
 		/// Default action is to delete and rebuild the object
 		/// </summary>
-		public virtual IEnumerable<string> AlterCommands(SqlSyntax syntax)
+		public virtual IEnumerable<string> AlterCommands(SqlSyntax syntax, Database database)
 		{
+			var dependencies = GetDependencies(database);
+			foreach (var obj in dependencies)
+			{
+				foreach (var cmd in obj.DropCommands(syntax)) yield return cmd;
+			}
+
 			foreach (var cmd in DropCommands(syntax)) yield return cmd;
 			foreach (var cmd in CreateCommands(syntax)) yield return cmd;
+
+			foreach (var obj in dependencies)
+			{
+				foreach (var cmd in obj.CreateCommands(syntax)) yield return cmd;
+			}
 		}
 
 		/// <summary>

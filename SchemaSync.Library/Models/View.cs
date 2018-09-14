@@ -7,7 +7,7 @@ namespace SchemaSync.Library.Models
 		public string Name { get; set; }
 		public string Body { get; set; }
 
-		public override IEnumerable<string> AlterCommands(SqlSyntax syntax)
+		public override IEnumerable<string> AlterCommands(SqlSyntax syntax, Database database)
 		{
 			throw new System.NotImplementedException();
 		}

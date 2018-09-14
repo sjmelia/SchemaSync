@@ -7,7 +7,7 @@ namespace SchemaSync.Library.Models
 	public abstract class DbObject
 	{
 		/// <summary>
-		/// Set by IsAltered to indicate what was if an object was altered
+		/// Set by IsAltered to indicate what was changed if an object was altered
 		/// </summary>
 		public string AlterDescription { get; protected set; }
 

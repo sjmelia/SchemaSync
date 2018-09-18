@@ -12,7 +12,7 @@ namespace SchemaSync.Library.Models
 		public bool IsNullable { get; set; }
 		public string Default { get; set; }
 		public string Collation { get; set; }
-		public int MaxLength { get; set; }
+		public long MaxLength { get; set; }
 		public int Scale { get; set; }
 		public int Precision { get; set; }
 

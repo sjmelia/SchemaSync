@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 15
-VisualStudioVersion = 15.0.27703.2047
+VisualStudioVersion = 15.0.27004.2009
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SchemaSync.Library", "SchemaSync.Library\SchemaSync.Library.csproj", "{551BDC7A-9001-427A-BB3A-05DFA1E855C7}"
 EndProject
@@ -12,6 +12,10 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ConsoleApp", "ConsoleApp\ConsoleApp.csproj", "{7675CEFE-6D55-4E65-A3B8-57D7C0FE9762}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SchemaSync.Postulate", "SchemaSync.Postulate\SchemaSync.Postulate.csproj", "{C005334E-6899-45CD-AB2A-E9FEE2E90190}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SchemaSync.MySql", "SchemaSync.MySql\SchemaSync.MySql.csproj", "{FDCC039D-EB6A-4522-84A1-54E9877E2EA3}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Tests.MySql", "Tests.MySql\Tests.MySql.csproj", "{B325CB43-0ED9-4AE6-8380-8BB0BFA2BF43}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -39,6 +43,14 @@ Global
 		{C005334E-6899-45CD-AB2A-E9FEE2E90190}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{C005334E-6899-45CD-AB2A-E9FEE2E90190}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{C005334E-6899-45CD-AB2A-E9FEE2E90190}.Release|Any CPU.Build.0 = Release|Any CPU
+		{FDCC039D-EB6A-4522-84A1-54E9877E2EA3}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{FDCC039D-EB6A-4522-84A1-54E9877E2EA3}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{FDCC039D-EB6A-4522-84A1-54E9877E2EA3}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{FDCC039D-EB6A-4522-84A1-54E9877E2EA3}.Release|Any CPU.Build.0 = Release|Any CPU
+		{B325CB43-0ED9-4AE6-8380-8BB0BFA2BF43}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B325CB43-0ED9-4AE6-8380-8BB0BFA2BF43}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B325CB43-0ED9-4AE6-8380-8BB0BFA2BF43}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B325CB43-0ED9-4AE6-8380-8BB0BFA2BF43}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
